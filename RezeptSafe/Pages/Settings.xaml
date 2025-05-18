@@ -9,5 +9,19 @@
         <Button x:Name="ThemeToggleButton"
                 Clicked="OnToggleThemeClicked"
                 Text="Wechsle zu Dunkelmodus" />
+        <Label Text="Datenbank" FontSize="20"/>
+        <Label x:Name="DBStatus" Text="Status: Unbekannt"/>
+        <Label x:Name="RecipeCount"/>
+        <Label x:Name="IngredientCount"/>
+        <Label x:Name="UtensilCount"/>
+        <Button x:Name="Export"
+                Clicked="ExportDB"
+                Text="Datenbank datei exportieren"/>
+        <Button x:Name="Import"
+                Clicked="ImportDB"
+                Text="Datenbank datei importieren"/>
+        <Button x:Name="Delete"
+                Clicked="DeleteDB"
+                Text="Datenbank zurücksetzen"/>
     </VerticalStackLayout>
 </ContentPage>

@@ -1,0 +1,23 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RezeptSafe.Pages.CreateRecipe"
+             Title="Rezept erstellen">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="10">
+
+            <Entry x:Name="TitleEntry" Placeholder="Titel" />
+
+            <Editor x:Name="DescriptionEditor" Placeholder="Beschreibung" HeightRequest="150"/>
+
+            <!-- Zutaten --><!--
+            <Entry x:Name="IngredientsEntry" Placeholder="Zutaten (Komma getrennt)" />
+
+            --><!-- Utensilien --><!--
+            <Entry x:Name="UtensilsEntry" Placeholder="Utensilien (Komma getrennt)" />-->
+
+            <Label x:Name="Username"/>
+            <Button Text="Speichern" Clicked="OnSaveClicked" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

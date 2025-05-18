@@ -1,0 +1,239 @@
+﻿using RezeptSafe.Model;
+using SQLite;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RezeptSafe.Data
+{
+    public interface IRecipeDatabase
+    {
+        // Utility
+        /// <summary>
+        /// Returns true if the connection to the Database is ok, else false
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> DBOnline();
+        /// <summary>
+        /// Closes the current Connection and opens a new One while also Executing the Initialisation of all Tables
+        /// </summary>
+        Task ResetAndInitConnection();
+        /// <summary>
+        /// Closes the current Connection
+        /// </summary>
+        Task CloseConnection();
+
+        // Rezepte
+        Task<List<Recipe>> GetAllRecipesAsync();
+        Task<Recipe> GetRecipeAsync(int id);
+        Task<int> AddRecipeAsync(Recipe recipe);
+        Task<int> UpdateRecipeAsync(Recipe recipe);
+        Task<int> DeleteRecipeAsync(int id);
+
+        // Zutaten
+        Task<List<Ingredient>> GetAllIngredientsAsync();
+        Task<int> AddIngredientAsync(Ingredient ingredient);
+        Task<int> DeleteIngredientAsync(int id);
+
+        Task<List<Ingredient>> GetIngredientsForRecipeAsync(int recipeId);
+        Task AddIngredientToRecipeAsync(int recipeId, int ingredientId);
+        Task RemoveIngredientFromRecipeAsync(int recipeId, int ingredientId);
+
+        // Utensilien
+        Task<List<Utensil>> GetAllUtensilsAsync();
+        Task<int> AddUtensilAsync(Utensil utensil);
+        Task<int> DeleteUtensilAsync(int id);
+
+        Task<List<Utensil>> GetUtensilsForRecipeAsync(int recipeId);
+        Task AddUtensilToRecipeAsync(int recipeId, int utensilId);
+        Task RemoveUtensilFromRecipeAsync(int recipeId, int utensilId);
+    }
+
+
+    public class RecipeDatabase : IRecipeDatabase
+    {
+        #region Attribute
+        private SQLiteAsyncConnection _connection;
+        public static readonly string DbPath = Path.Combine(FileSystem.AppDataDirectory, "Rezepte.db");
+        private bool DBFileFound = false;
+        #endregion
+
+        public RecipeDatabase()
+        {
+            this.DBFileFound = File.Exists(DbPath);
+
+            this.ResetAndInitConnection();
+        }
+
+        #region Methoden
+        public async Task<bool> DBOnline()
+        {
+            try
+            {
+                await this._connection.ExecuteAsync("SELECT 1;");
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task ResetAndInitConnection()
+        {
+            this._connection = new SQLiteAsyncConnection(DbPath);
+
+            await this._connection.CreateTableAsync<Recipe>();
+            await this._connection.CreateTableAsync<Ingredient>();
+            await this._connection.CreateTableAsync<Utensil>();
+            await this._connection.CreateTableAsync<RecipeIngredient>();
+            await this._connection.CreateTableAsync<RecipeUtensil>();
+        }
+
+        public async Task CloseConnection()
+        {
+            if(this._connection != null)
+            {
+                await this._connection.CloseAsync();
+            }
+        }
+        
+        public async Task<List<Recipe>> GetAllRecipesAsync()
+        {
+            return await this._connection.Table<Recipe>().ToListAsync();
+        }
+
+        public async Task<Recipe> GetRecipeAsync(int id)
+        {
+            return await this._connection.Table<Recipe>().Where(x => x.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<int> AddRecipeAsync(Recipe recipe)
+        {
+            await this._connection.InsertAsync(recipe);
+
+            foreach (Ingredient ingredient in recipe.Ingredients)
+            {
+                RecipeIngredient ri = new RecipeIngredient
+                {
+                    RecipeId = recipe.Id,
+                    IngredientId = ingredient.Id
+                };
+
+                await this._connection.InsertAsync(ri);
+            }
+
+            foreach (Utensil utensil in recipe.Utensils)
+            {
+                RecipeUtensil ru = new RecipeUtensil
+                {
+                    RecipeId = recipe.Id,
+                    UtensilId = utensil.Id
+                };
+
+                await this._connection.InsertAsync(ru);
+            }
+
+            return recipe.Id;
+        }
+
+        public async Task<int> UpdateRecipeAsync(Recipe recipe)
+        {
+            return await this._connection.UpdateAsync(recipe);
+        }
+
+        public async Task<int> DeleteRecipeAsync(int id)
+        {
+            return await this._connection.DeleteAsync<Recipe>(id);
+        }
+
+        public async Task<List<Ingredient>> GetAllIngredientsAsync()
+        {
+            return await this._connection.Table<Ingredient>().ToListAsync();
+        }
+
+        public async Task<int> AddIngredientAsync(Ingredient ingredient)
+        {
+            return await this._connection.InsertAsync(ingredient);
+        }
+
+        public async Task<int> DeleteIngredientAsync(int id)
+        {
+            return await this._connection.DeleteAsync<Ingredient>(id);
+        }
+
+        public async Task<List<Ingredient>> GetIngredientsForRecipeAsync(int recipeId)
+        {
+            string query = @"
+                SELECT i.*
+                FROM Ingredient i
+                INNER JOIN RecipeIngredient ri ON i.Id = ri.IngredientId
+                WHERE ri.RecipeId = ?";
+
+            return await _connection.QueryAsync<Ingredient>(query, recipeId);
+        }
+
+        public async Task AddIngredientToRecipeAsync(int recipeId, int ingredientId)
+        {
+            var ri = new RecipeIngredient
+            {
+                RecipeId = recipeId,
+                IngredientId = ingredientId
+            };
+
+            await this._connection.InsertAsync(ri);
+        }
+
+        public async Task RemoveIngredientFromRecipeAsync(int recipeId, int ingredientId)
+        {
+            await _connection.ExecuteAsync("DELETE FROM RecipeIngredient WHERE RecipeId = ? AND IngredientId = ?", recipeId, ingredientId);
+        }
+
+        public async Task<List<Utensil>> GetAllUtensilsAsync()
+        {
+            return await this._connection.Table<Utensil>().ToListAsync();
+        }
+
+        public async Task<int> AddUtensilAsync(Utensil utensil)
+        {
+            return await this._connection.InsertAsync(utensil);
+        }
+
+        public async Task<int> DeleteUtensilAsync(int id)
+        {
+            return await this._connection.DeleteAsync<Utensil>(id);
+        }
+
+        public async Task<List<Utensil>> GetUtensilsForRecipeAsync(int recipeId)
+        {
+            string query = @"
+                SELECT u.*
+                FROM Utensil u
+                INNER JOIN RecipeUtensil ru ON u.Id = ru.UtensilId
+                WHERE ru.RecipeId = ?";
+
+            return await _connection.QueryAsync<Utensil>(query, recipeId);
+        }
+
+        public async Task AddUtensilToRecipeAsync(int recipeId, int utensilId)
+        {
+            var ru = new RecipeUtensil
+            {
+                RecipeId = recipeId,
+                UtensilId = utensilId
+            };
+
+            await this._connection.InsertAsync(ru);
+        }
+
+        public async Task RemoveUtensilFromRecipeAsync(int recipeId, int utensilId)
+        {
+            await _connection.ExecuteAsync("DELETE FROM RecipeUtensil WHERE RecipeId = ? AND UtensilId = ?", recipeId, utensilId);
+        }
+        #endregion
+    }
+
+}
