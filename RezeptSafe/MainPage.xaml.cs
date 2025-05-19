@@ -33,13 +33,18 @@ namespace RezeptSafe
             var items = await this.database.GetAllRecipesAsync();
             _recipes.Clear();
             foreach (var recipe in items)
+            {
+                recipe.Ingredients = await this.database.GetIngredientsForRecipeAsync(recipe.Id);
+                recipe.Utensils = await this.database.GetUtensilsForRecipeAsync(recipe.Id);
                 _recipes.Add(recipe);
+            }
 
             this.RecipeList.ItemsSource = _recipes;
         }
 
         private async void OpenMenu(object sender, EventArgs e)
         {
+            this.MyButton.IsVisible = false;
             Overlay.IsVisible = true;
             await Overlay.FadeTo(1, 200);
             await SideMenu.TranslateTo(0, 0, 250, Easing.CubicOut);
@@ -47,6 +52,7 @@ namespace RezeptSafe
 
         private async void CloseMenu(object sender, EventArgs e)
         {
+            this.MyButton.IsVisible = true;
             await SideMenu.TranslateTo(250, 0, 250, Easing.CubicIn);
             await Overlay.FadeTo(0, 200);
             Overlay.IsVisible = false;

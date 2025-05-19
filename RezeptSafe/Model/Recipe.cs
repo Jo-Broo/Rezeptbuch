@@ -26,10 +26,10 @@ namespace RezeptSafe.Model
         public string Username { get; set; } = string.Empty;
 
         [Ignore]
-        public List<Utensil> Utensils { get; set; } = new List<Utensil>();
+        public List<UtensilWithAmount> Utensils { get; set; } = new List<UtensilWithAmount>();
         
         [Ignore]
-        public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
+        public List<IngredientWithAmount> Ingredients { get; set; } = new List<IngredientWithAmount>();
 
         [Ignore]
         public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count > 1) ? "ien" : "") }";

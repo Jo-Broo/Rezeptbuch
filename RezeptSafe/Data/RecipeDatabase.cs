@@ -38,8 +38,8 @@ namespace RezeptSafe.Data
         Task<int> AddIngredientAsync(Ingredient ingredient);
         Task<int> DeleteIngredientAsync(int id);
 
-        Task<List<Ingredient>> GetIngredientsForRecipeAsync(int recipeId);
-        Task AddIngredientToRecipeAsync(int recipeId, int ingredientId);
+        Task<List<IngredientWithAmount>> GetIngredientsForRecipeAsync(int recipeId);
+        Task AddIngredientToRecipeAsync(int recipeId, IngredientWithAmount ingredient);
         Task RemoveIngredientFromRecipeAsync(int recipeId, int ingredientId);
 
         // Utensilien
@@ -47,8 +47,8 @@ namespace RezeptSafe.Data
         Task<int> AddUtensilAsync(Utensil utensil);
         Task<int> DeleteUtensilAsync(int id);
 
-        Task<List<Utensil>> GetUtensilsForRecipeAsync(int recipeId);
-        Task AddUtensilToRecipeAsync(int recipeId, int utensilId);
+        Task<List<UtensilWithAmount>> GetUtensilsForRecipeAsync(int recipeId);
+        Task AddUtensilToRecipeAsync(int recipeId, UtensilWithAmount utensil);
         Task RemoveUtensilFromRecipeAsync(int recipeId, int utensilId);
     }
 
@@ -115,7 +115,7 @@ namespace RezeptSafe.Data
         {
             await this._connection.InsertAsync(recipe);
 
-            foreach (Ingredient ingredient in recipe.Ingredients)
+            foreach (IngredientWithAmount ingredient in recipe.Ingredients)
             {
                 RecipeIngredient ri = new RecipeIngredient
                 {
@@ -126,7 +126,7 @@ namespace RezeptSafe.Data
                 await this._connection.InsertAsync(ri);
             }
 
-            foreach (Utensil utensil in recipe.Utensils)
+            foreach (UtensilWithAmount utensil in recipe.Utensils)
             {
                 RecipeUtensil ru = new RecipeUtensil
                 {
@@ -165,7 +165,7 @@ namespace RezeptSafe.Data
             return await this._connection.DeleteAsync<Ingredient>(id);
         }
 
-        public async Task<List<Ingredient>> GetIngredientsForRecipeAsync(int recipeId)
+        public async Task<List<IngredientWithAmount>> GetIngredientsForRecipeAsync(int recipeId)
         {
             string query = @"
                 SELECT i.*
@@ -173,15 +173,17 @@ namespace RezeptSafe.Data
                 INNER JOIN RecipeIngredient ri ON i.Id = ri.IngredientId
                 WHERE ri.RecipeId = ?";
 
-            return await _connection.QueryAsync<Ingredient>(query, recipeId);
+            return await _connection.QueryAsync<IngredientWithAmount>(query, recipeId);
         }
 
-        public async Task AddIngredientToRecipeAsync(int recipeId, int ingredientId)
+        public async Task AddIngredientToRecipeAsync(int recipeId, IngredientWithAmount ingredient)
         {
             var ri = new RecipeIngredient
             {
                 RecipeId = recipeId,
-                IngredientId = ingredientId
+                IngredientId = ingredient.Id,
+                Amount = ingredient.Amount,
+                Unit = ingredient.Unit
             };
 
             await this._connection.InsertAsync(ri);
@@ -207,7 +209,7 @@ namespace RezeptSafe.Data
             return await this._connection.DeleteAsync<Utensil>(id);
         }
 
-        public async Task<List<Utensil>> GetUtensilsForRecipeAsync(int recipeId)
+        public async Task<List<UtensilWithAmount>> GetUtensilsForRecipeAsync(int recipeId)
         {
             string query = @"
                 SELECT u.*
@@ -215,15 +217,16 @@ namespace RezeptSafe.Data
                 INNER JOIN RecipeUtensil ru ON u.Id = ru.UtensilId
                 WHERE ru.RecipeId = ?";
 
-            return await _connection.QueryAsync<Utensil>(query, recipeId);
+            return await _connection.QueryAsync<UtensilWithAmount>(query, recipeId);
         }
 
-        public async Task AddUtensilToRecipeAsync(int recipeId, int utensilId)
+        public async Task AddUtensilToRecipeAsync(int recipeId, UtensilWithAmount utensil)
         {
             var ru = new RecipeUtensil
             {
                 RecipeId = recipeId,
-                UtensilId = utensilId
+                UtensilId = utensil.Id,
+                Amount = utensil.Amount
             };
 
             await this._connection.InsertAsync(ru);

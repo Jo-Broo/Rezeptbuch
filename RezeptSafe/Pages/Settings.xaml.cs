@@ -14,6 +14,12 @@ public partial class Settings : ContentPage
 		GetDBInformations();
 	}
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+		this.GetDBInformations();
+    }
+
 	private void UpdateThemeButtonText()
 	{
 		ThemeToggleButton.Text = App.Current.UserAppTheme == AppTheme.Dark
@@ -23,7 +29,7 @@ public partial class Settings : ContentPage
 
 	private async void GetDBInformations()
 	{
-		DBStatus.Text = this.database.DBOnline()
+		DBStatus.Text = await this.database.DBOnline()
 			? "Status: Online"
 			: "Status: Offline";
 

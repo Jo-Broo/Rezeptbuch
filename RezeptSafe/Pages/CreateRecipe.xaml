@@ -10,14 +10,43 @@
 
             <Editor x:Name="DescriptionEditor" Placeholder="Beschreibung" HeightRequest="150"/>
 
-            <!-- Zutaten --><!--
-            <Entry x:Name="IngredientsEntry" Placeholder="Zutaten (Komma getrennt)" />
+            <Label Text="Utensilien" FontAttributes="Bold"/>
+            <SearchBar x:Name="UtensilsSearchBar" Placeholder="Utensilien suchen"
+                   TextChanged="OnUtensilsSearchTextChanged"/>
+            <CollectionView x:Name="Utensils"
+                        SelectionMode="Multiple" HeightRequest="150">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10">
+                            <Label Text="{Binding Name}" />
+                            <Entry Grid.Column="1" WidthRequest="80"
+                                   Placeholder="Menge"
+                                   Text="{Binding Amount, Mode=TwoWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-            --><!-- Utensilien --><!--
-            <Entry x:Name="UtensilsEntry" Placeholder="Utensilien (Komma getrennt)" />-->
+            <Label Text="Zutaten" FontAttributes="Bold"/>
+            <SearchBar x:Name="IngredientsSearchBar" Placeholder="Zutaten suchen"
+                   TextChanged="OnIngredientsSearchTextChanged"/>
+            <CollectionView x:Name="Ingredients"
+                        SelectionMode="Multiple" HeightRequest="150">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="10">
+                            <Label Text="{Binding Name}" />
+                            <Entry Grid.Column="1" WidthRequest="80"
+                                   Placeholder="Menge"
+                                   Text="{Binding Amount, Mode=TwoWay}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
             <Label x:Name="Username"/>
             <Button Text="Speichern" Clicked="OnSaveClicked" />
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

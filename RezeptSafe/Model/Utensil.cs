@@ -28,4 +28,13 @@ namespace RezeptSafe.Model
         public int UtensilId { get; set; }
         public int Amount { get; set; }
     }
+
+    // DTO-Class
+    public class UtensilWithAmount
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public int Amount { get; set; }
+    }
 }
