@@ -1,12 +1,12 @@
-using RezeptSafe.Data;
+using RezeptSafe.Services;
 
-namespace RezeptSafe.Pages;
+namespace RezeptSafe.View;
 
 public partial class Settings : ContentPage
 {
-	private IRecipeDatabase database;
+	private IRezeptService database;
 	
-	public Settings(IRecipeDatabase db)
+	public Settings(IRezeptService db)
 	{
 		InitializeComponent();
 		this.database = db;
@@ -78,7 +78,7 @@ public partial class Settings : ContentPage
 
     private async void ImportDB(object sender, EventArgs e)
 	{
-        string dbPath = RecipeDatabase.DbPath;
+        string dbPath = LocalDatabaseService.DbPath;
 
         try
         {
@@ -111,7 +111,7 @@ public partial class Settings : ContentPage
 		{
             try
             {
-                string dbPath = RecipeDatabase.DbPath;
+                string dbPath = LocalDatabaseService.DbPath;
 
                 database.CloseConnection();
 

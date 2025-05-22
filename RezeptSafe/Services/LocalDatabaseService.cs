@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RezeptSafe.Data
+namespace RezeptSafe.Services
 {
-    public interface IRecipeDatabase
+    public interface IRezeptService
     {
         // Utility
         /// <summary>
@@ -53,7 +53,7 @@ namespace RezeptSafe.Data
     }
 
 
-    public class RecipeDatabase : IRecipeDatabase
+    public class LocalDatabaseService : IRezeptService
     {
         #region Attribute
         private SQLiteAsyncConnection _connection;
@@ -61,7 +61,7 @@ namespace RezeptSafe.Data
         private bool DBFileFound = false;
         #endregion
 
-        public RecipeDatabase()
+        public LocalDatabaseService()
         {
             this.DBFileFound = File.Exists(DbPath);
 

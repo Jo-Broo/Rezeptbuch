@@ -1,17 +1,17 @@
-using RezeptSafe.Data;
+using RezeptSafe.Services;
 using RezeptSafe.Model;
 
-namespace RezeptSafe.Pages;
+namespace RezeptSafe.View;
 
 public partial class CreateRecipe : ContentPage
 {
-    private readonly IRecipeDatabase database;
+    private readonly IRezeptService database;
     private readonly IUser user;
 
     private List<UtensilWithAmount> allUtensils;
     private List<IngredientWithAmount> allIngredients;
 
-    public CreateRecipe(IRecipeDatabase db, IUser user)
+    public CreateRecipe(IRezeptService db, IUser user)
 	{
 		InitializeComponent();
 		this.database = db;

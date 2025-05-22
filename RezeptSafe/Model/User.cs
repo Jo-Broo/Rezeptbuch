@@ -6,17 +6,8 @@ using System.Threading.Tasks;
 
 namespace RezeptSafe.Model
 {
-    public interface IUser
+    public class User
     {
-        string GetUsername();
-    }
-    public class User : IUser
-    {
-        public string Username = "Gast";
-
-        public string GetUsername()
-        {
-            return this.Username;
-        }
+        public string Username { get; set; } = string.Empty;
     }
 }

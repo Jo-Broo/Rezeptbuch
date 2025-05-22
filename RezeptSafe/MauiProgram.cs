@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using RezeptSafe.Data;
+using RezeptSafe.Services;
 using RezeptSafe.Model;
-using RezeptSafe.Pages;
+using RezeptSafe.ViewModel;
+using RezeptSafe.View;
 
 namespace RezeptSafe
 {
@@ -23,11 +24,17 @@ namespace RezeptSafe
     		builder.Logging.AddDebug();
 #endif
 
+            // Service
+            builder.Services.AddSingleton<IRezeptService, LocalDatabaseService>();
+            //builder.Services.AddSingleton<IUser, UserService>();
+            // ViewModels
+            builder.Services.AddSingleton<RecipesViewModel>();
+            builder.Services.AddTransient<RecipeDetailsViewModel>();
+            // Pages
             builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddTransient<Settings>();
-            builder.Services.AddTransient<CreateRecipe>();
-            builder.Services.AddSingleton<IRecipeDatabase, RecipeDatabase>();
-            builder.Services.AddSingleton<IUser, User>();
+            builder.Services.AddTransient<DetailsPage>();
+            //builder.Services.AddTransient<Settings>();
+            //builder.Services.AddTransient<CreateRecipe>();
 
             return builder.Build();
         }
