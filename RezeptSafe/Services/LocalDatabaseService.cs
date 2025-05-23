@@ -2,6 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -76,8 +77,9 @@ namespace RezeptSafe.Services
                 await this._connection.ExecuteAsync("SELECT 1;");
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Debug.WriteLine(ex.Message);
                 return false;
             }
         }
@@ -168,7 +170,7 @@ namespace RezeptSafe.Services
         public async Task<List<IngredientWithAmount>> GetIngredientsForRecipeAsync(int recipeId)
         {
             string query = @"
-                SELECT i.*
+                SELECT i.*, ri.Amount, ri.Unit
                 FROM Ingredient i
                 INNER JOIN RecipeIngredient ri ON i.Id = ri.IngredientId
                 WHERE ri.RecipeId = ?";
@@ -212,7 +214,7 @@ namespace RezeptSafe.Services
         public async Task<List<UtensilWithAmount>> GetUtensilsForRecipeAsync(int recipeId)
         {
             string query = @"
-                SELECT u.*
+                SELECT u.*, ru.Amount
                 FROM Utensil u
                 INNER JOIN RecipeUtensil ru ON u.Id = ru.UtensilId
                 WHERE ru.RecipeId = ?";

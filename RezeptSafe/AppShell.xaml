@@ -4,12 +4,18 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:view="clr-namespace:RezeptSafe.View"
-    Shell.FlyoutBehavior="Disabled"
-    Title="RezeptSafe">
+    Shell.FlyoutBehavior="Flyout"
+    Shell.TabBarIsVisible="False">
 
-    <ShellContent
+    <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
+        <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate view:MainPage}"
         Route="MainPage" />
-
+        
+        <ShellContent
+        Title="Einstellungen"
+        ContentTemplate="{DataTemplate view:Settings}"
+        Route="Settings" />
+    </FlyoutItem>
 </Shell>

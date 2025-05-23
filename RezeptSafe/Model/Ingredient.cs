@@ -38,6 +38,10 @@ namespace RezeptSafe.Model
         public string Description { get; set; } = string.Empty;
         public double Amount { get; set; }
         public string Unit { get; set; } = string.Empty;
+        public override string ToString()
+        {
+            return $"{Amount}{Unit} {Name}";
+        }
     }
 
 }

@@ -29,17 +29,13 @@ public partial class Settings : ContentPage
 
 	private async void GetDBInformations()
 	{
-		DBStatus.Text = await this.database.DBOnline()
-			? "Status: Online"
-			: "Status: Offline";
-
 		var recipes = await this.database.GetAllRecipesAsync();
 		var ingredients = await this.database.GetAllIngredientsAsync();
 		var utensils = await this.database.GetAllUtensilsAsync();
 
-		RecipeCount.Text = $"Rezeptanzahl: {recipes.Count}";
-		IngredientCount.Text = $"Zutatenanzahl: {ingredients.Count}";
-		UtensilCount.Text = $"Utensilienanzahl: {utensils.Count}";
+		this.RecipeCount.Text = $"Rezeptanzahl: {recipes.Count}";
+		this.IngredientCount.Text = $"Zutatenanzahl: {ingredients.Count}";
+		this.UtensilCount.Text = $"Utensilienanzahl: {utensils.Count}";
 	}
 
 	private void OnToggleThemeClicked(object sender, EventArgs e)
@@ -58,7 +54,7 @@ public partial class Settings : ContentPage
 		try
 		{
             string dbPath = Path.Combine(FileSystem.AppDataDirectory, "Rezepte.db");
-            string exportPath = Path.Combine(FileSystem.Current.CacheDirectory, "Rezepte_export.db");
+            string exportPath = Path.Combine(FileSystem.Current.CacheDirectory, $"Rezepte_{DateTime.Now.ToString("ddMMyyyyHHmm")}.db");
 
             File.Copy(dbPath, exportPath, overwrite: true);
 

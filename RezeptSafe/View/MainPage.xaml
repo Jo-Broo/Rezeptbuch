@@ -41,7 +41,7 @@
                                        Source="dotnet_bot.png"
                                        WidthRequest="125"
                                        HeightRequest="125"/>
-                                <VerticalStackLayout Grid.Column="1">
+                                <VerticalStackLayout Grid.Column="1" Spacing="11">
                                     <Label Text="{Binding Title}"/>
                                     <Label Text="{Binding UtensilienLabel}"/>
                                     <Label Text="{Binding ZutatenLabel}"/>

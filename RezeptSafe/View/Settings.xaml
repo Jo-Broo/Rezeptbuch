@@ -10,7 +10,6 @@
                 Clicked="OnToggleThemeClicked"
                 Text="Wechsle zu Dunkelmodus" />
         <Label Text="Datenbank" FontSize="20"/>
-        <Label x:Name="DBStatus" Text="Status: Unbekannt"/>
         <Label x:Name="RecipeCount"/>
         <Label x:Name="IngredientCount"/>
         <Label x:Name="UtensilCount"/>

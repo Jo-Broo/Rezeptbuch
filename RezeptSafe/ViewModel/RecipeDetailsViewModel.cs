@@ -11,11 +11,6 @@ namespace RezeptSafe.ViewModel
     [QueryProperty("Recipe","Recipe")]
     public partial class RecipeDetailsViewModel : BaseViewModel
     {
-        public RecipeDetailsViewModel()
-        {
-            
-        }
-
         [ObservableProperty]
         Recipe recipe;
     }

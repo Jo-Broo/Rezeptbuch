@@ -33,7 +33,7 @@ namespace RezeptSafe
             // Pages
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddTransient<DetailsPage>();
-            //builder.Services.AddTransient<Settings>();
+            builder.Services.AddTransient<Settings>();
             //builder.Services.AddTransient<CreateRecipe>();
 
             return builder.Build();

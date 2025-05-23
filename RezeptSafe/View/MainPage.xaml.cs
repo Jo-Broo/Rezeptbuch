@@ -10,19 +10,7 @@ namespace RezeptSafe.View
         public MainPage(RecipesViewModel viewModel)
         {
             InitializeComponent();
-            InitializeTheme();
             this.BindingContext = viewModel;
-        }
-
-        void InitializeTheme()
-        {
-            string theme = Preferences.Get("AppTheme", "Light");
-            App.Current.UserAppTheme = theme switch
-            {
-                "Dark" => AppTheme.Dark,
-                "Light" => AppTheme.Light,
-                _ => AppTheme.Light
-            };
         }
     }
 }
