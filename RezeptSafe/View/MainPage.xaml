@@ -20,6 +20,11 @@
         <CollectionView Grid.ColumnSpan="2"
                         ItemsSource="{Binding Recipes}"
                         SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HeightRequest="50">
+                    <Label Text="Diese Liste ist leer" VerticalOptions="Center" HorizontalOptions="Center" FontSize="30"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Recipe">
                     <Grid Padding="10">
@@ -54,11 +59,17 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Text="Rezepte abfragen"
+        <Button Text="Neues Rezept erstellen"
+                Command="{Binding GoToCreateRecipeCommand}"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Margin="10"/>
+        
+        <!--<Button Text="Rezepte abfragen"
                 Command="{Binding GetRecipesCommand}"
                 IsEnabled="{Binding IsNotBusy}"
                 Grid.Row="1"
-                Margin="8"/>
+                Margin="8"/>-->
 
         <ActivityIndicator IsVisible="{Binding IsBusy}"
                            IsRunning="{Binding IsBusy}"

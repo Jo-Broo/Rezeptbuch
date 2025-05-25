@@ -14,11 +14,6 @@ namespace RezeptSafe.Services
     {
         // Utility
         /// <summary>
-        /// Returns true if the connection to the Database is ok, else false
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> DBOnline();
-        /// <summary>
         /// Closes the current Connection and opens a new One while also Executing the Initialisation of all Tables
         /// </summary>
         Task ResetAndInitConnection();
@@ -70,20 +65,6 @@ namespace RezeptSafe.Services
         }
 
         #region Methoden
-        public async Task<bool> DBOnline()
-        {
-            try
-            {
-                await this._connection.ExecuteAsync("SELECT 1;");
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-                return false;
-            }
-        }
-
         public async Task ResetAndInitConnection()
         {
             this._connection = new SQLiteAsyncConnection(DbPath);

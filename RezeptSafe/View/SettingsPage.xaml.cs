@@ -2,11 +2,11 @@ using RezeptSafe.Services;
 
 namespace RezeptSafe.View;
 
-public partial class Settings : ContentPage
+public partial class SettingsPage : ContentPage
 {
 	private IRezeptService database;
 	
-	public Settings(IRezeptService db)
+	public SettingsPage(IRezeptService db)
 	{
 		InitializeComponent();
 		this.database = db;

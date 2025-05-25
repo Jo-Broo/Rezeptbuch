@@ -26,15 +26,16 @@ namespace RezeptSafe
 
             // Service
             builder.Services.AddSingleton<IRezeptService, LocalDatabaseService>();
-            //builder.Services.AddSingleton<IUser, UserService>();
+            builder.Services.AddSingleton<IUserService, UserService>();
             // ViewModels
             builder.Services.AddSingleton<RecipesViewModel>();
             builder.Services.AddTransient<RecipeDetailsViewModel>();
+            builder.Services.AddTransient<CreateRecipeViewModel>();
             // Pages
             builder.Services.AddSingleton<MainPage>();
             builder.Services.AddTransient<DetailsPage>();
-            builder.Services.AddTransient<Settings>();
-            //builder.Services.AddTransient<CreateRecipe>();
+            builder.Services.AddTransient<SettingsPage>();
+            builder.Services.AddTransient<CreateRecipePage>();
 
             return builder.Build();
         }

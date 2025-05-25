@@ -8,14 +8,7 @@
     Shell.TabBarIsVisible="False">
 
     <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
-        <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate view:MainPage}"
-        Route="MainPage" />
-        
-        <ShellContent
-        Title="Einstellungen"
-        ContentTemplate="{DataTemplate view:Settings}"
-        Route="Settings" />
+        <ShellContent Title="Home" ContentTemplate="{DataTemplate view:MainPage}" Route="MainPage" />
+        <ShellContent Title="Einstellungen" ContentTemplate="{DataTemplate view:SettingsPage}" Route="SettingsPage" />
     </FlyoutItem>
 </Shell>

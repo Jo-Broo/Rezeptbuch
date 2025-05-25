@@ -7,14 +7,19 @@ using System.Threading.Tasks;
 
 namespace RezeptSafe.Services
 {
-    public interface IUser
+    public interface IUserService
     {
         public string GetUsername();
     }
 
-    public class UserService : IUser
+    public class UserService : IUserService
     {
         User current = new User();
+
+        public UserService()
+        {
+            current.Username = DeviceInfo.Name;
+        }
 
         public string GetUsername()
         {

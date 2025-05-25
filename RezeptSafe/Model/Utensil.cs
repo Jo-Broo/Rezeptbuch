@@ -1,5 +1,4 @@
-﻿using Kotlin;
-using SQLite;
+﻿using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,11 +30,8 @@ namespace RezeptSafe.Model
     }
 
     // DTO-Class
-    public class UtensilWithAmount
+    public class UtensilWithAmount : Utensil
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
         public int Amount { get; set; }
         public override string ToString()
         {

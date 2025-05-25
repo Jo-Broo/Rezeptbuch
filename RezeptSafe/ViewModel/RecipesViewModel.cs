@@ -41,6 +41,12 @@ namespace RezeptSafe.ViewModel
         }
 
         [RelayCommand]
+        async Task GoToCreateRecipeAsync()
+        {
+            await Shell.Current.GoToAsync($"{nameof(CreateRecipePage)}", true);
+        }
+
+        [RelayCommand]
         async Task GetRecipesAsync()
         {
             if (this.IsBusy)
