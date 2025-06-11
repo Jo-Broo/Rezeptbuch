@@ -4,46 +4,103 @@
              xmlns:model="clr-namespace:RezeptSafe.Model"
              x:Class="RezeptSafe.View.CreateRecipePage"
              x:DataType="viewmodel:CreateRecipeViewModel"
-             Title="Rezept erstellen">
+             Title="{Binding Title}">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="10">
+        <VerticalStackLayout Spacing="10">
+            <Frame CornerRadius="12"
+                   HasShadow="False"
+                   Margin="10"
+                   BackgroundColor="LightGray">
+                <VerticalStackLayout>
+                    <Entry Placeholder="Titel" Text="{Binding Recipe.Title}"/>
 
-            <Entry x:Name="TitleEntry" Placeholder="Titel" />
+                    <Editor Placeholder="Beschreibung" HeightRequest="150" Text="{Binding Recipe.Description}"/>
+                </VerticalStackLayout>
+            </Frame>
 
-            <Editor x:Name="DescriptionEditor" Placeholder="Beschreibung" HeightRequest="150"/>
+            <Frame CornerRadius="12"
+                   HasShadow="False"
+                   Margin="10"
+                   BackgroundColor="LightGray">
+                <VerticalStackLayout>
+                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
+                        <Label Text="Zutaten" FontSize="30" Grid.Column="0"/>
+                        <SearchBar Placeholder="Suchfeld" Text="{Binding IngredientSearchText}" Grid.Column="1"/>
+                    </Grid>
 
-            <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                <Label Text="Zutaten" FontSize="30" Grid.Column="0"/>
-                <SearchBar Placeholder="Suchfeld" Text="{Binding IngredientSearchText}" Grid.Column="1"/>
-            </Grid>
-            
-            <CollectionView ItemsSource="{Binding FilteredIngredients}" 
-                            SelectionMode="Multiple"
-                            HeightRequest="300"
-                            SelectionChanged="OnIngredientsSelectionChanged">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:IngredientWithAmount">
-                        <Grid ColumnDefinitions="auto,*,100">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup Name="CommonStates">
-                                    <VisualState Name="Normal"/>
-                                    <VisualState Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="LightBlue" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <Label Text="{Binding Name}" FontSize="20" Grid.Column="0" VerticalOptions="Center" Padding="10"/>
-                            <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                    <CollectionView ItemsSource="{Binding FilteredIngredients}" 
+                                    SelectionMode="Multiple"
+                                    HeightRequest="300"
+                                    SelectionChanged="OnIngredientsSelectionChanged">   
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:Ingredient">
+                                <Grid ColumnDefinitions="auto,*,100">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup Name="CommonStates">
+                                            <VisualState Name="Normal"/>
+                                            <VisualState Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="LightBlue" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Label Text="{Binding Name}" FontSize="20" Grid.Column="0" VerticalOptions="Center" Padding="10"/>
+                                    <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
 
-            <Label Text="Erstellt von: " FontSize="30"/>
-            <Label Text="{Binding Recipe.Username}"/>
+            <Frame CornerRadius="12"
+                   HasShadow="False"
+                   Margin="10"
+                   BackgroundColor="LightGray">
+                <VerticalStackLayout>
+                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
+                        <Label Text="Utensilien" FontSize="30" Grid.Column="0"/>
+                        <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1"/>
+                    </Grid>
+
+                    <CollectionView ItemsSource="{Binding FilteredUtensils}" 
+                                    SelectionMode="Multiple"
+                                    HeightRequest="300"
+                                    SelectionChanged="OnUtensilsSelectionChanged">  
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:Utensil">
+                                <Grid ColumnDefinitions="auto,*,100">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup Name="CommonStates">
+                                            <VisualState Name="Normal"/>
+                                            <VisualState Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="LightBlue" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
+                                    <Label Text="{Binding Name}" FontSize="20" Grid.Column="0" VerticalOptions="Center" Padding="10"/>
+                                    <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame CornerRadius="12"
+                   HasShadow="False"
+                   Margin="10"
+                   BackgroundColor="LightGray">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
+                    <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1"/>
+                    <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
+                </VerticalStackLayout>
+            </Frame>
 
         </VerticalStackLayout>
     </ScrollView>

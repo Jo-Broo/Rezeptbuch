@@ -9,10 +9,8 @@ namespace RezeptSafe.Model
 {
     public class Recipe
     {
-        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
-        [MaxLength(100)]
         public string Title { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
@@ -25,19 +23,11 @@ namespace RezeptSafe.Model
 
         public string Username { get; set; } = string.Empty;
 
-        [Ignore]
-        public List<UtensilWithAmount> Utensils { get; set; } = new List<UtensilWithAmount>();
-        
-        [Ignore]
-        public List<IngredientWithAmount> Ingredients { get; set; } = new List<IngredientWithAmount>();
+        public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
 
-        [Ignore]
-        public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count > 1) ? "ien" : "") }";
-
-        [Ignore]
+        public List<Utensil> Utensils { get; set; } = new List<Utensil>();
+        public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count > 1) ? "ien" : "")}";
         public string ZutatenLabel => $"{this.Utensils.Count} Zutat{((this.Utensils.Count > 1) ? "en" : "")}";
-
-        [Ignore]
         public string ZeitLabel => $"ca. {this.Time} minuten";
     }
 }

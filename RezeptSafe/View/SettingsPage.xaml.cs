@@ -1,3 +1,4 @@
+using RezeptSafe.Interfaces;
 using RezeptSafe.Services;
 
 namespace RezeptSafe.View;
@@ -8,6 +9,8 @@ public partial class SettingsPage : ContentPage
 	
 	public SettingsPage(IRezeptService db)
 	{
+		// ViewModel implementieren
+
 		InitializeComponent();
 		this.database = db;
 		UpdateThemeButtonText();
@@ -74,7 +77,7 @@ public partial class SettingsPage : ContentPage
 
     private async void ImportDB(object sender, EventArgs e)
 	{
-        string dbPath = LocalDatabaseService.DbPath;
+		string dbPath = DBConstants.DbPath;
 
         try
         {
@@ -90,13 +93,12 @@ public partial class SettingsPage : ContentPage
                 await stream.CopyToAsync(destStream);
             }
 
-			database.ResetAndInitConnection();
+			database.GetConnection();
 
             await DisplayAlert("Information", "Datenbank wurde erfolgreich importiert", "OK");
         }
 		catch (Exception ex)
 		{
-
             await DisplayAlert("Error", ex.Message, "OK");
         }
 	}
@@ -107,9 +109,9 @@ public partial class SettingsPage : ContentPage
 		{
             try
             {
-                string dbPath = LocalDatabaseService.DbPath;
+                string dbPath = DBConstants.DbPath;
 
-                database.CloseConnection();
+                await database.CloseConnection();
 
                 File.Delete(dbPath);
 
@@ -118,7 +120,8 @@ public partial class SettingsPage : ContentPage
                     await DisplayAlert("Info", "Datenbank wurde erfolgreich zurückgesetzt.", "OK");
                 }
 
-                database.ResetAndInitConnection();
+				database.GetConnection();
+				await database.InitializeDataBase();
             }
             catch (Exception ex)
             {

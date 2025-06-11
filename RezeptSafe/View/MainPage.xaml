@@ -21,8 +21,8 @@
                         ItemsSource="{Binding Recipes}"
                         SelectionMode="None">
             <CollectionView.EmptyView>
-                <VerticalStackLayout HeightRequest="50">
-                    <Label Text="Diese Liste ist leer" VerticalOptions="Center" HorizontalOptions="Center" FontSize="30"/>
+                <VerticalStackLayout HeightRequest="100" VerticalOptions="Start">
+                    <Label Text="Sie haben noch keine Rezepte gespeichert" FontSize="30" Padding="10"/>
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>

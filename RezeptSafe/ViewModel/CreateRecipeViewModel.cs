@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RezeptSafe.Interfaces;
 using RezeptSafe.Model;
 using RezeptSafe.Services;
 using System;
@@ -20,14 +21,22 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         Recipe recipe = new Recipe();
 
-        public ObservableCollection<Utensil> Utensils { get; private set; } = new ObservableCollection<Utensil>();
-        List<Utensil> allUtensils = new List<Utensil>();
 
         [ObservableProperty]
-        ObservableCollection<IngredientWithAmount> allIngredients;
+        ObservableCollection<Utensil> allUtensils;
 
         [ObservableProperty]
-        ObservableCollection<IngredientWithAmount> filteredIngredients;
+        ObservableCollection<Utensil> filteredUtensils;
+
+        [ObservableProperty]
+        string utensilSearchText;
+
+
+        [ObservableProperty]
+        ObservableCollection<Ingredient> allIngredients;
+
+        [ObservableProperty]
+        ObservableCollection<Ingredient> filteredIngredients;
 
         [ObservableProperty]
         string ingredientSearchText;
@@ -39,11 +48,15 @@ namespace RezeptSafe.ViewModel
 
             this.recipe.Username = this.userService.GetUsername();
 
-            this.AllIngredients = new ObservableCollection<IngredientWithAmount>();
-            this.FilteredIngredients = new ObservableCollection<IngredientWithAmount>();
+            this.AllIngredients = new ObservableCollection<Ingredient>();
+            this.FilteredIngredients = new ObservableCollection<Ingredient>();
+            this.AllUtensils = new ObservableCollection<Utensil>();
+            this.FilteredUtensils = new ObservableCollection<Utensil>();
             this.IngredientSearchText = string.Empty;
+            this.UtensilSearchText = string.Empty;
 
             this.QueryAllIngredients();
+            this.QueryAllUtensils();
         }
 
         partial void OnIngredientSearchTextChanged(string value)
@@ -55,12 +68,29 @@ namespace RezeptSafe.ViewModel
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                FilteredIngredients = new ObservableCollection<IngredientWithAmount>(AllIngredients);
+                FilteredIngredients = new ObservableCollection<Ingredient>(AllIngredients);
             }
             else
             {
-                FilteredIngredients = new ObservableCollection<IngredientWithAmount>(
+                FilteredIngredients = new ObservableCollection<Ingredient>(
                     AllIngredients.Where(i => i.Name.Contains(query, StringComparison.OrdinalIgnoreCase)));
+            }
+        }
+        partial void OnUtensilSearchTextChanged(string value)
+        {
+            FilterUtensils(value);
+        }
+
+        void FilterUtensils(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                FilteredUtensils = new ObservableCollection<Utensil>(AllUtensils);
+            }
+            else
+            {
+                FilteredUtensils = new ObservableCollection<Utensil>(
+                    AllUtensils.Where(i => i.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)));
             }
         }
 
@@ -75,31 +105,34 @@ namespace RezeptSafe.ViewModel
 
             foreach (var ingredient in ingredients)
             {
-                var ingredientwithamount = new IngredientWithAmount
-                {
-                    Name = ingredient.Name,
-                    Description = ingredient.Description
-                };
-
-                this.AllIngredients?.Add(ingredientwithamount);
-                this.FilteredIngredients?.Add(ingredientwithamount);
+                this.AllIngredients?.Add(ingredient);
+                this.FilteredIngredients?.Add(ingredient);
             }
         }
 
         public async void QueryAllUtensils()
         {
-            this.allUtensils = await this.rezeptService.GetAllUtensilsAsync();
+            var utensils = await this.rezeptService.GetAllUtensilsAsync();
 
-            if(this.Utensils.Count != 0)
+            if(this.filteredUtensils.Count != 0)
             {
-                this.Utensils.Clear();
+                this.filteredUtensils?.Clear();
             }
 
-            foreach (var utensil in this.allUtensils)
+            foreach (var utensil in utensils)
             {
-                this.Utensils.Add(utensil);
+                this.AllUtensils?.Add(utensil);
+                this.FilteredUtensils?.Add(utensil);
             }
         }
 
+        [RelayCommand]
+        async Task OnSaveClickedAsync()
+        {
+            this.rezeptService.AddRecipeAsync(this.Recipe);
+
+            await Shell.Current.GoToAsync("..");
+
+        }
     }
 }

@@ -10,5 +10,6 @@
     <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
         <ShellContent Title="Home" ContentTemplate="{DataTemplate view:MainPage}" Route="MainPage" />
         <ShellContent Title="Einstellungen" ContentTemplate="{DataTemplate view:SettingsPage}" Route="SettingsPage" />
+        <ShellContent Title="Profil" ContentTemplate="{DataTemplate view:ProfilPage}" Route="ProfilPage" />
     </FlyoutItem>
 </Shell>

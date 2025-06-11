@@ -11,6 +11,7 @@ namespace RezeptSafe
             // nameof(DetailsPage) == "DetailsPage"
             Routing.RegisterRoute(nameof(DetailsPage),typeof(DetailsPage));
             Routing.RegisterRoute(nameof(CreateRecipePage),typeof(CreateRecipePage));
+            Routing.RegisterRoute(nameof(QRCodePopup),typeof(QRCodePopup));
         }
     }
 }

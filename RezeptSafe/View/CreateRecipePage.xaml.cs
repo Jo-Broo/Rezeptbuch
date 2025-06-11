@@ -14,26 +14,21 @@ public partial class CreateRecipePage : ContentPage
 
     private void OnIngredientsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        foreach (IngredientWithAmount removed in e.PreviousSelection)
+        foreach (Ingredient removed in e.PreviousSelection)
             removed.IsSelected = false;
 
-        foreach (IngredientWithAmount added in e.CurrentSelection)
+        foreach (Ingredient added in e.CurrentSelection)
             added.IsSelected = true;
     }
 
-    //private void OnUtensilsSearchTextChanged(object sender, TextChangedEventArgs e)
-    //{
-    //    var keyword = e.NewTextValue?.ToLower() ?? "";
-    //    Utensils.ItemsSource = allUtensils
-    //        .Where(x => x.Name.ToLower().Contains(keyword)).ToList();
-    //}
+    private void OnUtensilsSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        foreach (Utensil removed in e.PreviousSelection)
+            removed.IsSelected = false;
 
-    //private void OnIngredientsSearchTextChanged(object sender, TextChangedEventArgs e)
-    //{
-    //    var keyword = e.NewTextValue?.ToLower() ?? "";
-    //    Ingredients.ItemsSource = allIngredients
-    //        .Where(x => x.Name.ToLower().Contains(keyword)).ToList();
-    //}
+        foreach (Utensil added in e.CurrentSelection)
+            added.IsSelected = true;
+    }
 
     //private async void OnSaveClicked(object sender, EventArgs e)
     //{
