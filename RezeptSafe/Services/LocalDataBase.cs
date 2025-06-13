@@ -48,11 +48,10 @@ namespace RezeptSafe.Services
                                                     ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                                                     TITLE VARCHAR(100),
                                                     DESCRIPTION VARCHAR,
-                                                    INSTRUCTIONS VARCHAR,
-                                                    CREATEDAT BIGINT,
+                                                    CREATEDAT DATETIME DEFAULT CURRENT_TIMESTAMP,
                                                     TIME INTEGER,
                                                     USERNAME VARCHAR,
-                                                    IMAGEPATH VARCHAR -- Pfad zum Bild
+                                                    IMAGEPATH VARCHAR
                                                 );";
                 await conn.ExecuteAsync(sql);
 
@@ -309,7 +308,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<List<Recipe>> GetAllRecipesAsync()
         {
             try
@@ -336,7 +334,6 @@ namespace RezeptSafe.Services
                 return new List<Recipe>();
             }
         }
-
         public async Task<Recipe> GetRecipeAsync(int id)
         {
             try
@@ -362,22 +359,117 @@ namespace RezeptSafe.Services
                 return new Recipe();
             }
         }
-
-        public Task<int> AddRecipeAsync(Recipe recipe)
+        public async Task<int> AddRecipeAsync(Recipe recipe)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"INSERT INTO RECIPE(TITLE,DESCRIPTION,TIME,USERNAME,IMAGEPATH) 
+                               VALUES
+                                ('?','?',?,'?','?')";
+                var result = await conn.ExecuteAsync(sql,recipe.Title,recipe.Description,recipe.Time,recipe.Username,recipe.ImagePath);
 
-        public Task<int> UpdateRecipeAsync(Recipe recipe)
+                if(result == 1)
+                {
+                    recipe.Id = await this.GetLastRecipeIDAsync();
+
+                    var tasks = new List<Task>();
+
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        tasks.Add(this.AddIngredientToRecipeAsync(recipe.Id, ingredient));
+                    }
+
+                    foreach (var utensil in recipe.Utensils)
+                    {
+                        tasks.Add(this.AddUtensilToRecipeAsync(recipe.Id,utensil));
+                    }
+
+                    await Task.WhenAll(tasks);
+
+                    return 1;
+                }
+
+                throw new Exception("Beim einfügen des Rezeptes ist ein Fehler aufgetreten");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+        public async Task<int> UpdateRecipeAsync(Recipe recipe)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"UPDATE RECIPE SET 
+                                TITLE = '?',
+                                DESCRIPTION = '?',
+                                TIME = ?,
+                                USERNAME = '?',
+                                IMAGEPATH = '?')
+                               WHERE
+                                ID = ?";
+                var result = await conn.ExecuteAsync(sql, recipe.Title, recipe.Description, recipe.Time, recipe.Username, recipe.ImagePath, recipe.Id);
 
-        public Task<int> DeleteRecipeAsync(int id)
+                if (result == 1)
+                {
+                    // Zutaten und Utensilien werden einfach gelöscht und neu angelegt
+                    // wie viele können das schon sein
+
+                    await this.RemoveAllIngredientsFromRecipeAsync(recipe.Id);
+
+                    await this.RemoveAllUtensilsFromRecipeAsync(recipe.Id);
+
+                    var tasks = new List<Task>();
+
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        tasks.Add(this.AddIngredientToRecipeAsync(recipe.Id, ingredient));
+                    }
+
+                    foreach (var utensil in recipe.Utensils)
+                    {
+                        tasks.Add(this.AddUtensilToRecipeAsync(recipe.Id, utensil));
+                    }
+
+                    await Task.WhenAll(tasks);
+
+                    return 1;
+                }
+
+                throw new Exception("Beim einfügen des Rezeptes ist ein Fehler aufgetreten");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+        public async Task<int> DeleteRecipeAsync(int recipeID)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"DELETE * FORM RECIPE WHERE ID = ?";
 
+                var result = await conn.ExecuteAsync(sql, recipeID);
+                if (result == 1)
+                {
+                    await this.RemoveAllIngredientsFromRecipeAsync(recipeID);
+
+                    await this.RemoveAllUtensilsFromRecipeAsync(recipeID);
+                }
+
+                return 1;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
         public async Task<int> GetLastRecipeIDAsync()
         {
             try
@@ -398,7 +490,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<List<Ingredient>> GetAllIngredientsAsync()
         {
             try
@@ -415,7 +506,7 @@ namespace RezeptSafe.Services
                 return new List<Ingredient>();
             }
         }
-
+        
         public async Task<int> AddIngredientAsync(Ingredient ingredient)
         {
             try
@@ -432,7 +523,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<int> DeleteIngredientAsync(int id)
         {
             try
@@ -449,7 +539,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<List<Ingredient>> GetIngredientsForRecipeAsync(int recipeId)
         {
             try
@@ -475,7 +564,6 @@ namespace RezeptSafe.Services
                 return new List<Ingredient>();
             }
         }
-
         public async Task<int> AddIngredientToRecipeAsync(int recipeId, Ingredient ingredient)
         {
             try
@@ -492,7 +580,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<int> RemoveIngredientFromRecipeAsync(int recipeId, int ingredientId)
         {
             try
@@ -509,7 +596,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<List<Utensil>> GetAllUtensilsAsync()
         {
             try
@@ -524,6 +610,21 @@ namespace RezeptSafe.Services
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
                 return new List<Utensil>();
+            }
+        }
+        public async Task<int> RemoveAllIngredientsFromRecipeAsync(int recipeID)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"DELETE FROM RECIPEINGREDIENT WHERE RECIPEID = ?";
+
+                return await conn.ExecuteScalarAsync<int>(sql, recipeID);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
             }
         }
 
@@ -543,7 +644,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<int> DeleteUtensilAsync(int id)
         {
             try
@@ -560,7 +660,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<List<Utensil>> GetUtensilsForRecipeAsync(int recipeId)
         {
             try
@@ -585,7 +684,6 @@ namespace RezeptSafe.Services
                 return new List<Utensil>();
             }
         }
-
         public async Task<int> AddUtensilToRecipeAsync(int recipeId, Utensil utensil)
         {
             try
@@ -602,7 +700,6 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-
         public async Task<int> RemoveUtensilFromRecipeAsync(int recipeId, int utensilId)
         {
             try
@@ -619,7 +716,20 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<int> RemoveAllUtensilsFromRecipeAsync(int recipeID)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"DELETE FROM RECIPEUTENSIL WHERE RECIPEID = ?";
 
-        
+                return await conn.ExecuteScalarAsync<int>(sql, recipeID);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
     }
 }
