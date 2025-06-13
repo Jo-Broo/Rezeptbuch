@@ -10,6 +10,7 @@ namespace RezeptSafe.Services
     public interface IUserService
     {
         public string GetUsername();
+        public void SetUsername(string username);
     }
 
     public class UserService : IUserService
@@ -18,12 +19,27 @@ namespace RezeptSafe.Services
 
         public UserService()
         {
-            current.Username = DeviceInfo.Name;
+            string preference = Preferences.Get("Username", string.Empty);
+
+            if (preference == string.Empty)
+            {
+                this.current.Username = DeviceInfo.Name;
+            }
+            else
+            {
+                this.current.Username = preference;
+            }
         }
 
         public string GetUsername()
         {
             return this.current.Username;
+        }
+
+        public void SetUsername(string username)
+        {
+            this.current.Username = username;
+            Preferences.Set("Username", username);
         }
     }
 }

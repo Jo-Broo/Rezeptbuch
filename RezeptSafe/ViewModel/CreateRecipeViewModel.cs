@@ -21,23 +21,18 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         Recipe recipe = new Recipe();
 
-
         [ObservableProperty]
         ObservableCollection<Utensil> allUtensils;
-
         [ObservableProperty]
         ObservableCollection<Utensil> filteredUtensils;
-
         [ObservableProperty]
         string utensilSearchText;
 
 
         [ObservableProperty]
         ObservableCollection<Ingredient> allIngredients;
-
         [ObservableProperty]
         ObservableCollection<Ingredient> filteredIngredients;
-
         [ObservableProperty]
         string ingredientSearchText;
 

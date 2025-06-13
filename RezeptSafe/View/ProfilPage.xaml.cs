@@ -9,4 +9,9 @@ public partial class ProfilPage : ContentPage
 		InitializeComponent();
 		this.BindingContext = vm;
 	}
+
+    private void Entry_TextChanged(object sender, TextChangedEventArgs e)
+    {
+		(this.BindingContext as ProfilViewModel).NameHasChanged = true;
+    }
 }

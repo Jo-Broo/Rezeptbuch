@@ -1,26 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:RezeptSafe.Model"
+             xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
+             x:DataType="viewmodel:SettingsViewModel"
              x:Class="RezeptSafe.View.SettingsPage"
              Title="Settings">
     
     <VerticalStackLayout Padding="20" Spacing="25">
         <Label Text="Designmodus" FontSize="20" />
-        <Button x:Name="ThemeToggleButton"
-                Clicked="OnToggleThemeClicked"
-                Text="Wechsle zu Dunkelmodus" />
-        <Label Text="Datenbank" FontSize="20"/>
+        <Button Command="{Binding ToggleThemeClickedCommand}"
+                Text="{Binding ButtonText}" />
+        <!--<Label Text="Datenbank" FontSize="20"/>
         <Label x:Name="RecipeCount"/>
         <Label x:Name="IngredientCount"/>
-        <Label x:Name="UtensilCount"/>
-        <Button x:Name="Export"
-                Clicked="ExportDB"
+        <Label x:Name="UtensilCount"/>-->
+        <HorizontalStackLayout>
+            <CheckBox IsChecked="{Binding ShowAdvancedOptions}" 
+              VerticalOptions="Center" />
+            <Label Text="Erweiterte Datenbankoptionen anzeigen"
+                   WidthRequest="300"
+           FontSize="20" 
+           VerticalOptions="Center" />
+        </HorizontalStackLayout>
+
+        <Button IsVisible="{Binding ShowAdvancedOptions}"
+                Command="{Binding ExportDataBaseToFileCommand}"
                 Text="Datenbank datei exportieren"/>
-        <Button x:Name="Import"
-                Clicked="ImportDB"
+        <Button IsVisible="{Binding ShowAdvancedOptions}"
+                Command="{Binding ImportDataBaseFromFileCommand}"
                 Text="Datenbank datei importieren"/>
-        <Button x:Name="Delete"
-                Clicked="DeleteDB"
+        <Button IsVisible="{Binding ShowAdvancedOptions}"
+                Command="{Binding ResetDataBaseCommand}"
                 Text="Datenbank zurücksetzen"/>
     </VerticalStackLayout>
 </ContentPage>

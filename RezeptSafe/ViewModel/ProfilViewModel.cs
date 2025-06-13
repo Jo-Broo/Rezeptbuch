@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RezeptSafe.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +9,28 @@ using System.Threading.Tasks;
 
 namespace RezeptSafe.ViewModel
 {
-    public class ProfilViewModel : BaseViewModel
+    public partial class ProfilViewModel : BaseViewModel
     {
+        IUserService userService;
+
+        [ObservableProperty]
+        string username;
+
+        [ObservableProperty]
+        bool nameHasChanged;
+
+        public ProfilViewModel(IUserService userService) 
+        {
+            this.userService = userService;
+            this.Username = this.userService.GetUsername();
+            this.NameHasChanged = false;
+        }
+
+        [RelayCommand]
+        async Task SetUsernameAsync(string username)
+        {
+            this.userService.SetUsername(username);
+            this.NameHasChanged = false;
+        }
     }
 }

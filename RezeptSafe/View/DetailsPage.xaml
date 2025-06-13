@@ -32,7 +32,7 @@
                 </CollectionView>
                 <Label Text="{Binding Recipe.ZeitLabel}" Margin="5"/>
                 <Border BackgroundColor="White" HeightRequest="2"/>
-                <Label Text="{Binding Recipe.Instructions}" Margin="5"/>
+                <Label Text="{Binding Recipe.Description}" Margin="5"/>
             </VerticalStackLayout>
         </ScrollView>
         <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQrClickedAsyncCommand}"/>

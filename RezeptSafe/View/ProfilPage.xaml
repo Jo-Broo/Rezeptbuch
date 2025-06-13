@@ -7,10 +7,8 @@
              x:Class="RezeptSafe.View.ProfilPage"
              Title="{Binding Title}">
     <VerticalStackLayout>
-        <Entry Placeholder="Benutzername" Margin="5"/>
-        <Label 
-            Text="Todo: Profilseite erstellen"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <Label Text="Username:"/>
+        <Entry Placeholder="Benutzername" Margin="5" Text="{Binding Username}" TextChanged="Entry_TextChanged"/>
+        <Button Text="Änderung speichern" IsVisible="{Binding NameHasChanged}" CommandParameter="{Binding Username}" Command="{Binding SetUsernameCommand}"/>
     </VerticalStackLayout>
 </ContentPage>
