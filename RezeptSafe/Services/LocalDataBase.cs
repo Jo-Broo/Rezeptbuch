@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static SQLite.SQLite3;
 
 namespace RezeptSafe.Services
 {
@@ -25,11 +26,18 @@ namespace RezeptSafe.Services
             }
         }
 
-        public SQLiteAsyncConnection GetConnection()
+        public SQLiteAsyncConnection GetConnection(string databaseFile = "")
         {
             if (_connection == null)
             {
-                _connection = new SQLiteAsyncConnection(DBConstants.DbPath);
+                if(databaseFile == "")
+                {
+                    _connection = new SQLiteAsyncConnection(DBConstants.DbPath);
+                }
+                else
+                {
+                    _connection = new SQLiteAsyncConnection(databaseFile);
+                }
             }
 
             return _connection;
@@ -366,7 +374,7 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
                 string sql = @"INSERT INTO RECIPE(TITLE,DESCRIPTION,TIME,USERNAME,IMAGEPATH) 
                                VALUES
-                                ('?','?',?,'?','?')";
+                                (?,?,?,?,?)";
                 var result = await conn.ExecuteAsync(sql,recipe.Title,recipe.Description,recipe.Time,recipe.Username,recipe.ImagePath);
 
                 if(result == 1)
@@ -404,11 +412,11 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
                 string sql = @"UPDATE RECIPE SET 
-                                TITLE = '?',
-                                DESCRIPTION = '?',
+                                TITLE = ?,
+                                DESCRIPTION = ?,
                                 TIME = ?,
-                                USERNAME = '?',
-                                IMAGEPATH = '?')
+                                USERNAME = ?,
+                                IMAGEPATH = ?)
                                WHERE
                                 ID = ?";
                 var result = await conn.ExecuteAsync(sql, recipe.Title, recipe.Description, recipe.Time, recipe.Username, recipe.ImagePath, recipe.Id);
@@ -627,6 +635,48 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<Ingredient> IngredientPresentInDatabase(Ingredient ingredient)
+        {
+            Ingredient result = new Ingredient();
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"SELECT * FROM INGREDIENT WHERE LOWER(NAME) LIKE LOWER(?)";
+                result = (await conn.QueryAsync<Ingredient>(sql, ingredient.Name)).FirstOrDefault();
+
+                if(result == null)
+                {
+                    result = new Ingredient() { Id = -1 };
+                    throw new Exception($"Keine Zutat mit dem Namen [{ingredient.Name}] gefunden");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            
+            return result;
+        }
+        public async Task<int> GetLastIngredientIDAsync()
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT MAX(ID) AS ID FROM INGREDIENT";
+                var result = await conn.ExecuteScalarAsync<int?>(sql);
+
+                if (result == null)
+                    throw new Exception("Keine Rezepte vorhanden.");
+
+                return result.Value;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
 
         public async Task<int> AddUtensilAsync(Utensil utensil)
         {
@@ -724,6 +774,48 @@ namespace RezeptSafe.Services
                 string sql = @"DELETE FROM RECIPEUTENSIL WHERE RECIPEID = ?";
 
                 return await conn.ExecuteScalarAsync<int>(sql, recipeID);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+        public async Task<Utensil> UtensilPresentInDatabase(Utensil utensil)
+        {
+            Utensil result = new Utensil();
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"SELECT * FROM UTENSIL WHERE LOWER(NAME) LIKE LOWER(?)";
+                result = (await conn.QueryAsync<Utensil>(sql, utensil.Name)).FirstOrDefault();
+
+                if (result == null)
+                {
+                    result = new Utensil() { Id = -1 };
+                    throw new Exception($"Kein Utensil mit dem Namen [{utensil.Name}] gefunden");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
+            return result;
+        }
+        public async Task<int> GetLastUtensilIDAsync()
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT MAX(ID) AS ID FROM UTENSIL";
+                var result = await conn.ExecuteScalarAsync<int?>(sql);
+
+                if (result == null)
+                    throw new Exception("Keine Rezepte vorhanden.");
+
+                return result.Value;
             }
             catch (Exception ex)
             {

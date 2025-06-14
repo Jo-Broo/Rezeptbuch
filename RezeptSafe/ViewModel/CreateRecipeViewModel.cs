@@ -17,6 +17,7 @@ namespace RezeptSafe.ViewModel
     {
         IRezeptService rezeptService;
         IUserService userService;
+        IAlertService alertService;
 
         [ObservableProperty]
         Recipe recipe = new Recipe();
@@ -36,10 +37,11 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         string ingredientSearchText;
 
-        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService) 
+        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService) 
         {
             this.rezeptService = rezeptservice;
             this.userService = userService;
+            this.alertService = alertService;
 
             this.recipe.Username = this.userService.GetUsername();
 
@@ -109,9 +111,9 @@ namespace RezeptSafe.ViewModel
         {
             var utensils = await this.rezeptService.GetAllUtensilsAsync();
 
-            if(this.filteredUtensils.Count != 0)
+            if(this.FilteredUtensils.Count != 0)
             {
-                this.filteredUtensils?.Clear();
+                this.FilteredUtensils?.Clear();
             }
 
             foreach (var utensil in utensils)
@@ -124,10 +126,19 @@ namespace RezeptSafe.ViewModel
         [RelayCommand]
         async Task OnSaveClickedAsync()
         {
-            this.rezeptService.AddRecipeAsync(this.Recipe);
+            this.Recipe.Ingredients = this.AllIngredients.Where(x => x.IsSelected == true).ToList();
+
+            this.Recipe.Utensils = this.AllUtensils.Where(x => x.IsSelected == true).ToList();
+
+            if(!this.Recipe.IsValidRecipe(out string error))
+            {
+                await this.alertService.ShowAlertAsync("Error", error);
+                return;
+            }
+
+            await this.rezeptService.AddRecipeAsync(this.Recipe);
 
             await Shell.Current.GoToAsync("..");
-
         }
     }
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mct:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+            x:Class="RezeptSafe.View.ProgressPopup">
+
+    <VerticalStackLayout Padding="20" Spacing="10">
+
+        <Label x:Name="TitleLabel"
+           Text="Bitte warten..."
+           FontAttributes="Bold"
+           FontSize="18"
+           TextColor="Black" />
+        <Label x:Name="RecipeCount"
+                FontSize="18"
+                TextColor="Black"/>
+        <Label x:Name="IngredientCount"
+                FontSize="18"
+                TextColor="Black"/>
+        <Label x:Name="UtensilCount"
+                FontSize="18"
+                TextColor="Black"/>
+
+        <ProgressBar x:Name="Progressbar"
+             HeightRequest="10"
+             ProgressColor="DarkBlue" />
+
+        <Label x:Name="PercentLabel"
+       Text="0 %"
+       FontSize="14"
+       HorizontalOptions="End"
+       TextColor="Gray" />
+
+    </VerticalStackLayout>
+</mct:Popup>

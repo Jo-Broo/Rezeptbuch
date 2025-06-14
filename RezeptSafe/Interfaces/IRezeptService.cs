@@ -5,7 +5,7 @@ namespace RezeptSafe.Interfaces
 {
     public interface IRezeptService
     {
-        SQLiteAsyncConnection GetConnection();
+        SQLiteAsyncConnection GetConnection(string databaseFile = "");
         Task<int> InitializeDataBase();
         Task CloseConnection();
 
@@ -25,6 +25,8 @@ namespace RezeptSafe.Interfaces
         Task<int> AddIngredientToRecipeAsync(int recipeID, Ingredient ingredient);
         Task<int> RemoveIngredientFromRecipeAsync(int recipeID, int ingredientID);
         Task<int> RemoveAllIngredientsFromRecipeAsync(int recipeID);
+        Task<Ingredient> IngredientPresentInDatabase(Ingredient ingredient);
+        Task<int> GetLastIngredientIDAsync();
  
         // Utensilien
         Task<List<Utensil>> GetAllUtensilsAsync();
@@ -34,6 +36,8 @@ namespace RezeptSafe.Interfaces
         Task<int> AddUtensilToRecipeAsync(int recipeID, Utensil utensil);
         Task<int> RemoveUtensilFromRecipeAsync(int recipeID, int utensilID);
         Task<int> RemoveAllUtensilsFromRecipeAsync(int recipeID);
+        Task<Utensil> UtensilPresentInDatabase(Utensil utensil);
+        Task<int> GetLastUtensilIDAsync();
     }
 
     public static class DBConstants

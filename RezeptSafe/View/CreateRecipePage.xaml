@@ -91,6 +91,8 @@
                    HasShadow="False"
                    Margin="10">
                 <VerticalStackLayout Spacing="10">
+                    <Label Text="Zeitangabe:" FontSize="20" Grid.Column="0"/>
+                    <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.Time}"/>
                     <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
                     <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1"/>
                     <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
