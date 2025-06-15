@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
+using RezeptSafe.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +17,13 @@ namespace RezeptSafe.ViewModel
         bool isBusy;
         [ObservableProperty]
         string title;
+
+        internal IAlertService alertService;
+
+        public BaseViewModel(IAlertService alertService)
+        {
+            this.alertService = alertService;
+        }
 
         public bool IsNotBusy => !this.IsBusy;
     }

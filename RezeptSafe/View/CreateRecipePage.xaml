@@ -8,6 +8,7 @@
 
     <ScrollView>
         <VerticalStackLayout Spacing="10">
+            <Button Text="Aus CR-Code" Margin="10" FontSize="20" Command="{Binding ScanQRCodeClickedCommand}"/>
             <Frame CornerRadius="12"
                    HasShadow="False"
                    Margin="10">

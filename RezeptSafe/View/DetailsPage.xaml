@@ -35,7 +35,7 @@
                 <Label Text="{Binding Recipe.Description}" Margin="5"/>
             </VerticalStackLayout>
         </ScrollView>
-        <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQrClickedAsyncCommand}"/>
+        <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQRClickedCommand}"/>
     </Grid>
     
     

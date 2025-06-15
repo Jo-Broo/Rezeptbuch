@@ -18,7 +18,7 @@ namespace RezeptSafe.ViewModel
         IRezeptService rezeptService;
         public ObservableCollection<Recipe> Recipes{ get; } = new();
 
-        public RecipesViewModel(IRezeptService rezeptService)
+        public RecipesViewModel(IRezeptService rezeptService, IAlertService alertService) : base(alertService)
         {
             this.Title = "Rezeptübersicht";
             this.rezeptService = rezeptService;

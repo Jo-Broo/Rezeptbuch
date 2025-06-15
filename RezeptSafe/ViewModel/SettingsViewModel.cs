@@ -18,12 +18,10 @@ namespace RezeptSafe.ViewModel
         string buttonText;
 
         IRezeptService rezeptService;
-        IAlertService alertService;
 
-        public SettingsViewModel(IRezeptService rezeptService, IAlertService alertService)
+        public SettingsViewModel(IRezeptService rezeptService, IAlertService alertService): base(alertService)
         {
             this.rezeptService = rezeptService;
-            this.alertService = alertService;
             this.UpdateButtonText();
         }
 

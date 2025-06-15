@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using RezeptSafe.Interfaces;
 using RezeptSafe.Services;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         bool nameHasChanged;
 
-        public ProfilViewModel(IUserService userService) 
+        public ProfilViewModel(IUserService userService, IAlertService alertService) : base(alertService)
         {
             this.userService = userService;
             this.Username = this.userService.GetUsername();

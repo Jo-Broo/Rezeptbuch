@@ -1,14 +1,18 @@
+using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
+using RezeptSafe.ViewModel;
+
 namespace RezeptSafe.View;
 
-public partial class QRCodePopup : ContentPage
+public partial class QRCodePopup : Popup
 {
 	public QRCodePopup()
 	{
 		InitializeComponent();
 	}
 
-    private async void OnCloseClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("..");
-    }
+	public void SetQRCodeValue(string value)
+	{
+		this.QRCodeImage.Value = value;
+	}
 }

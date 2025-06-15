@@ -1,8 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RezeptSafe.Interfaces;
 using RezeptSafe.Model;
 using RezeptSafe.Services;
+using RezeptSafe.View;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +19,6 @@ namespace RezeptSafe.ViewModel
     {
         IRezeptService rezeptService;
         IUserService userService;
-        IAlertService alertService;
 
         [ObservableProperty]
         Recipe recipe = new Recipe();
@@ -37,11 +38,10 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         string ingredientSearchText;
 
-        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService) 
+        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService) : base(alertService) 
         {
             this.rezeptService = rezeptservice;
             this.userService = userService;
-            this.alertService = alertService;
 
             this.recipe.Username = this.userService.GetUsername();
 
@@ -121,6 +121,15 @@ namespace RezeptSafe.ViewModel
                 this.AllUtensils?.Add(utensil);
                 this.FilteredUtensils?.Add(utensil);
             }
+        }
+
+        [RelayCommand]
+        async Task OnScanQRCodeClicked()
+        {
+            string qrcodecontent = await Shell.Current.ShowPopupAsync(new QRCodeScanPopup()) as string;
+
+            if(!string.IsNullOrEmpty(qrcodecontent))
+                await this.alertService.ShowAlertAsync("Barcode detected", qrcodecontent);
         }
 
         [RelayCommand]

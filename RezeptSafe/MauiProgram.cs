@@ -4,6 +4,7 @@ using RezeptSafe.Interfaces;
 using RezeptSafe.Services;
 using RezeptSafe.View;
 using RezeptSafe.ViewModel;
+using ZXing.Net.Maui.Controls;
 
 namespace RezeptSafe
 {
@@ -19,7 +20,8 @@ namespace RezeptSafe
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+                })
+                .UseBarcodeReader();
 
 #if DEBUG
     		builder.Logging.AddDebug();
@@ -29,6 +31,7 @@ namespace RezeptSafe
             builder.Services.AddSingleton<IRezeptService, LocalDataBase>();
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IAlertService, AlertService>();
+            builder.Services.AddSingleton<IRezeptShareService, RezeptShareService>();
             // ViewModels
             builder.Services.AddSingleton<RecipesViewModel>();
             builder.Services.AddTransient<RecipeDetailsViewModel>();
