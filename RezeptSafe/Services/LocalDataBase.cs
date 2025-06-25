@@ -498,6 +498,65 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<int> AddExternalRecipeAsync(Recipe recipe)
+        {
+            try
+            {
+                List<Ingredient> internalIngredients = new List<Ingredient>();
+                foreach (Ingredient ingredient in recipe.Ingredients)
+                {
+                    if(string.IsNullOrWhiteSpace(ingredient.Name) || ingredient.Amount <= 0)
+                    {
+                        throw new InvalidOperationException("Non Valid Ingredient found");
+                    }
+                    
+                    Ingredient? tmp = await this.IngredientPresentInDatabase(ingredient);
+                    if (tmp is null)
+                    {
+                        // Zutat muss noch erstellt werden
+                        await this.AddIngredientAsync(ingredient);
+                        ingredient.Id = await this.GetLastIngredientIDAsync();
+                        tmp = ingredient;
+                    }
+                    // Zutat ist bereits vorhanden
+                    tmp.Amount = ingredient.Amount;
+                    tmp.Unit = ingredient.Unit;
+                    internalIngredients.Add(tmp);
+                }
+
+                List<Utensil> internalUtensils = new List<Utensil>();
+                foreach (Utensil utensil in recipe.Utensils)
+                {
+                    if (string.IsNullOrWhiteSpace(utensil.Name) || utensil.Amount <= 0)
+                    {
+                        throw new InvalidOperationException("Non Valid Utensil found");
+                    }
+
+                    Utensil? tmp = await this.UtensilPresentInDatabase(utensil);
+                    if (tmp is null)
+                    {
+                        // Utensil muss noch erstellt werden
+                        await this.AddUtensilAsync(utensil);
+                        utensil.Id = await this.GetLastUtensilIDAsync();
+                        tmp = utensil;
+                    }
+                    // Utensil ist bereits vorhanden
+                    tmp.Amount = utensil.Amount;
+                    internalUtensils.Add(tmp);
+                }
+
+                recipe.Ingredients = internalIngredients;
+                recipe.Utensils = internalUtensils;
+
+                return await this.AddRecipeAsync(recipe);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+
         public async Task<List<Ingredient>> GetAllIngredientsAsync()
         {
             try
@@ -514,7 +573,6 @@ namespace RezeptSafe.Services
                 return new List<Ingredient>();
             }
         }
-        
         public async Task<int> AddIngredientAsync(Ingredient ingredient)
         {
             try
@@ -635,9 +693,9 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-        public async Task<Ingredient> IngredientPresentInDatabase(Ingredient ingredient)
+        public async Task<Ingredient?> IngredientPresentInDatabase(Ingredient ingredient)
         {
-            Ingredient result = new Ingredient();
+            Ingredient? result = new Ingredient();
             try
             {
                 var conn = this.GetConnection();
@@ -646,7 +704,6 @@ namespace RezeptSafe.Services
 
                 if(result == null)
                 {
-                    result = new Ingredient() { Id = -1 };
                     throw new Exception($"Keine Zutat mit dem Namen [{ingredient.Name}] gefunden");
                 }
             }
@@ -781,9 +838,9 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-        public async Task<Utensil> UtensilPresentInDatabase(Utensil utensil)
+        public async Task<Utensil?> UtensilPresentInDatabase(Utensil utensil)
         {
-            Utensil result = new Utensil();
+            Utensil? result = new Utensil();
             try
             {
                 var conn = this.GetConnection();
@@ -792,7 +849,6 @@ namespace RezeptSafe.Services
 
                 if (result == null)
                 {
-                    result = new Utensil() { Id = -1 };
                     throw new Exception($"Kein Utensil mit dem Namen [{utensil.Name}] gefunden");
                 }
             }

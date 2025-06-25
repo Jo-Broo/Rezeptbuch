@@ -16,6 +16,7 @@ namespace RezeptSafe.Interfaces
         Task<int> UpdateRecipeAsync(Recipe recipe);
         Task<int> DeleteRecipeAsync(int recipeID);
         Task<int> GetLastRecipeIDAsync();
+        Task<int> AddExternalRecipeAsync(Recipe recipe);
 
         // Zutaten
         Task<List<Ingredient>> GetAllIngredientsAsync();
@@ -25,7 +26,7 @@ namespace RezeptSafe.Interfaces
         Task<int> AddIngredientToRecipeAsync(int recipeID, Ingredient ingredient);
         Task<int> RemoveIngredientFromRecipeAsync(int recipeID, int ingredientID);
         Task<int> RemoveAllIngredientsFromRecipeAsync(int recipeID);
-        Task<Ingredient> IngredientPresentInDatabase(Ingredient ingredient);
+        Task<Ingredient?> IngredientPresentInDatabase(Ingredient ingredient);
         Task<int> GetLastIngredientIDAsync();
  
         // Utensilien
@@ -36,7 +37,7 @@ namespace RezeptSafe.Interfaces
         Task<int> AddUtensilToRecipeAsync(int recipeID, Utensil utensil);
         Task<int> RemoveUtensilFromRecipeAsync(int recipeID, int utensilID);
         Task<int> RemoveAllUtensilsFromRecipeAsync(int recipeID);
-        Task<Utensil> UtensilPresentInDatabase(Utensil utensil);
+        Task<Utensil?> UtensilPresentInDatabase(Utensil utensil);
         Task<int> GetLastUtensilIDAsync();
     }
 
