@@ -21,6 +21,7 @@ namespace RezeptSafe.Model
         public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count > 1) ? "ien" : "")}";
         public string ZutatenLabel => $"{this.Utensils.Count} Zutat{((this.Utensils.Count > 1) ? "en" : "")}";
         public string ZeitLabel => $"ca. {this.Time} minute{((this.Time > 1) ? "n":"")}";
+        public string UsernameLabel => $"Erstellt von: {this.Username}";
         public bool IsValidRecipe(out string error)
         {
             if (string.IsNullOrWhiteSpace(this.Title))
