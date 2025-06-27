@@ -32,18 +32,22 @@ namespace RezeptSafe
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IAlertService, AlertService>();
             builder.Services.AddSingleton<IRezeptShareService, RezeptShareService>();
+            builder.Services.AddSingleton<IThemeService, ThemeService>();
             // ViewModels
             builder.Services.AddSingleton<RecipesViewModel>();
             builder.Services.AddTransient<RecipeDetailsViewModel>();
             builder.Services.AddTransient<CreateRecipeViewModel>();
             builder.Services.AddTransient<ProfilViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
+            builder.Services.AddTransient<LandingPageViewModel>();
             // Pages
-            builder.Services.AddSingleton<MainPage>();
+            builder.Services.AddSingleton<LandingPage>();
+            builder.Services.AddSingleton<ListRecipesPage>();
             builder.Services.AddTransient<DetailsPage>();
             builder.Services.AddTransient<SettingsPage>();
             builder.Services.AddTransient<CreateRecipePage>();
             builder.Services.AddTransient<ProfilPage>();
+            builder.Services.AddTransient<QRCodeScanner>();
 
             return builder.Build();
         }

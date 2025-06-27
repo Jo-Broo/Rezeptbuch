@@ -4,8 +4,10 @@ using System.Text;
 
 namespace RezeptSafe.Services
 {
-    internal class RezeptShareService : IRezeptShareService
+    public class RezeptShareService : IRezeptShareService
     {
+        private TaskCompletionSource<string?>? _scanCompletionSource;
+
         public string CompressJsonToBase64(string json)
         {
             byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
@@ -32,6 +34,17 @@ namespace RezeptSafe.Services
             byte[] decompressedBytes = outputStream.ToArray();
 
             return Encoding.UTF8.GetString(decompressedBytes);
+        }
+
+        public Task<string?> WaitForScanAsync()
+        {
+            _scanCompletionSource = new TaskCompletionSource<string?>();
+            return _scanCompletionSource.Task;
+        }
+
+        public void CompleteScan(string? result)
+        {
+            _scanCompletionSource?.TrySetResult(result);
         }
     }
 }

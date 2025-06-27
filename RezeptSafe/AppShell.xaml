@@ -4,12 +4,18 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:view="clr-namespace:RezeptSafe.View"
-    Shell.FlyoutBehavior="Flyout"
-    Shell.TabBarIsVisible="False">
+    Shell.FlyoutBehavior="Disabled" BackgroundColor="{StaticResource Android}">
 
-    <FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
+    <Shell.ToolbarItems>
+        <ToolbarItem x:Name="ThemeButton" Text="test" Clicked="ToolbarItem_Clicked"/>
+        <!--<ToolbarItem x:Name="AddRecipe" Text="+"/>-->
+    </Shell.ToolbarItems>
+    
+    <ShellContent Title="Start" ContentTemplate="{ DataTemplate view:LandingPage}"/>
+
+    <!--<FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
         <ShellContent Title="Home" ContentTemplate="{DataTemplate view:MainPage}" Route="MainPage" />
         <ShellContent Title="Einstellungen" ContentTemplate="{DataTemplate view:SettingsPage}" Route="SettingsPage" />
         <ShellContent Title="Profil" ContentTemplate="{DataTemplate view:ProfilPage}" Route="ProfilPage" />
-    </FlyoutItem>
+    </FlyoutItem>-->
 </Shell>

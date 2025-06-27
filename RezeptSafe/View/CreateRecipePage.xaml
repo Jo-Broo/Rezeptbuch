@@ -8,23 +8,21 @@
 
     <ScrollView>
         <VerticalStackLayout Spacing="10">
-            <Button Text="Aus CR-Code" Margin="10" FontSize="20" Command="{Binding ScanQRCodeClickedCommand}"/>
-            <Frame CornerRadius="12"
-                   HasShadow="False"
-                   Margin="10">
+            <!--<Button Text="Aus CR-Code" Margin="10" FontSize="20" Command="{Binding ScanQRCodeClickedCommand}"/>-->
+            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
                 <VerticalStackLayout>
-                    <Entry Placeholder="Titel" Text="{Binding Recipe.Title}"/>
-                    <Editor Placeholder="Beschreibung" HeightRequest="150" Text="{Binding Recipe.Description}"/>
+                    <Label Text="Rezeptname" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                    <Entry Placeholder="Titel" Text="{Binding Recipe.Title}" PlaceholderColor="Black"/>
+                    <Label Text="Beschreibung" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                    <Editor Placeholder="Beschreibung" Text="{Binding Recipe.Description}" PlaceholderColor="Black"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame CornerRadius="12"
-                   HasShadow="False"
-                   Margin="10">
+            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
                 <VerticalStackLayout>
                     <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                        <Label Text="Zutaten" FontSize="30" Grid.Column="0"/>
-                        <SearchBar Placeholder="Suchfeld" Text="{Binding IngredientSearchText}" Grid.Column="1"/>
+                        <Label Text="Zutaten" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                        <SearchBar Placeholder="Suchfeld" Text="{Binding IngredientSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
                     </Grid>
 
                     <CollectionView ItemsSource="{Binding FilteredIngredients}" 
@@ -44,7 +42,7 @@
                                             </VisualState>
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Label Text="{Binding Name}" FontSize="20" Grid.Column="0" VerticalOptions="Center" Padding="10"/>
+                                    <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
                                     <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
                                 </Grid>
                             </DataTemplate>
@@ -53,15 +51,12 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame CornerRadius="12"
-                   HasShadow="False"
-                   Margin="10">
+            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
                 <VerticalStackLayout>
                     <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                        <Label Text="Utensilien" FontSize="30" Grid.Column="0"/>
-                        <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1"/>
+                        <Label Text="Utensilien" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                        <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
                     </Grid>
-
                     <CollectionView ItemsSource="{Binding FilteredUtensils}" 
                                     SelectionMode="Multiple"
                                     HeightRequest="300"
@@ -79,7 +74,7 @@
                                             </VisualState>
                                         </VisualStateGroup>
                                     </VisualStateManager.VisualStateGroups>
-                                    <Label Text="{Binding Name}" FontSize="20" Grid.Column="0" VerticalOptions="Center" Padding="10"/>
+                                    <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
                                     <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
                                 </Grid>
                             </DataTemplate>
@@ -88,14 +83,12 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <Frame CornerRadius="12"
-                   HasShadow="False"
-                   Margin="10">
+            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Zeitangabe:" FontSize="20" Grid.Column="0"/>
                     <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.Time}"/>
                     <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
-                    <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1"/>
+                    <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1" TextColor="White"/>
                     <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
                 </VerticalStackLayout>
             </Frame>

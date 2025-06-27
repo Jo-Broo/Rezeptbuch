@@ -73,8 +73,11 @@
 	  <Compile Update="View\DetailsPage.xaml.cs">
 	    <DependentUpon>DetailsPage.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="View\QRCodeScanPopup.xaml.cs">
-	    <DependentUpon>QRCodeScanPopup.xaml</DependentUpon>
+	  <Compile Update="View\ListRecipes.xaml.cs">
+	    <DependentUpon>ListRecipes.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="View\QRCodeScanner.xaml.cs">
+	    <DependentUpon>QRCodeScanner.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="View\ProfilPage.xaml.cs">
 	    <DependentUpon>ProfilPage.xaml</DependentUpon>
@@ -94,7 +97,10 @@
 	  <MauiXaml Update="View\DetailsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="View\QRCodeScanPopup.xaml">
+	  <MauiXaml Update="View\LandingPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\QRCodeScanner.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\ProfilPage.xaml">

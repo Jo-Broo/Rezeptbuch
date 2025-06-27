@@ -10,7 +10,7 @@ public partial class CreateRecipePage : ContentPage
 	{
 		InitializeComponent();
         this.BindingContext = vm;
-	}
+    }
 
     private void OnIngredientsSelectionChanged(object sender, SelectionChangedEventArgs e)
     {

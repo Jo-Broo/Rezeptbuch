@@ -8,9 +8,9 @@
              Title="Settings">
     
     <VerticalStackLayout Padding="20" Spacing="25">
-        <Label Text="Designmodus" FontSize="20" />
-        <Button Command="{Binding ToggleThemeClickedCommand}"
-                Text="{Binding ButtonText}" />
+        <!--<Label Text="Designmodus" FontSize="20" />-->
+        <!--<Button Command="{Binding ToggleThemeClickedCommand}"
+                Text="{Binding ButtonText}" />-->
         <!--<Label Text="Datenbank" FontSize="20"/>
         <Label x:Name="RecipeCount"/>
         <Label x:Name="IngredientCount"/>

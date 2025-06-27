@@ -19,6 +19,7 @@ namespace RezeptSafe.ViewModel
     {
         IRezeptService rezeptService;
         IUserService userService;
+        IRezeptShareService shareService;
 
         [ObservableProperty]
         Recipe recipe = new Recipe();
@@ -38,12 +39,13 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         string ingredientSearchText;
 
-        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService) : base(alertService) 
+        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService, IRezeptShareService shareService) : base(alertService) 
         {
             this.rezeptService = rezeptservice;
             this.userService = userService;
+            this.shareService = shareService;
 
-            this.recipe.Username = this.userService.GetUsername();
+            this.Recipe.Username = this.userService.GetUsername();
 
             this.AllIngredients = new ObservableCollection<Ingredient>();
             this.FilteredIngredients = new ObservableCollection<Ingredient>();
@@ -126,9 +128,11 @@ namespace RezeptSafe.ViewModel
         [RelayCommand]
         async Task OnScanQRCodeClicked()
         {
-            string qrcodecontent = await Shell.Current.ShowPopupAsync(new QRCodeScanPopup()) as string;
+            await Shell.Current.GoToAsync(nameof(QRCodeScanner), true);
 
-            if(!string.IsNullOrEmpty(qrcodecontent))
+            string? qrcodecontent = await this.shareService.WaitForScanAsync();
+
+            if (!string.IsNullOrEmpty(qrcodecontent))
                 await this.alertService.ShowAlertAsync("Barcode detected", qrcodecontent);
         }
 

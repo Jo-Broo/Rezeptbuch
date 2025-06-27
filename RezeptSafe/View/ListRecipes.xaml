@@ -5,7 +5,7 @@
              xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
              x:DataType="viewmodel:RecipesViewModel"
              Title="{Binding Title}"
-             x:Class="RezeptSafe.View.MainPage">
+             x:Class="RezeptSafe.View.ListRecipesPage">
 
     <Grid ColumnSpacing="5">
         <Grid.RowDefinitions>
@@ -28,8 +28,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Recipe">
                     <Grid Padding="10">
-                        <Frame HeightRequest="125"
-                               Padding="5">
+                        <Frame Style="{StaticResource RecipeDetailFrameStyle}">
                             <Frame.GestureRecognizers>
                                 <TapGestureRecognizer CommandParameter="{Binding .}"
                                                       Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:RecipesViewModel}}, Path=GoToDetailsCommand}"/>
@@ -42,15 +41,12 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Image Aspect="AspectFill" 
-                                       Source="dotnet_bot.png"
-                                       WidthRequest="125"
-                                       HeightRequest="125"/>
-                                <VerticalStackLayout Grid.Column="1" Spacing="11">
-                                    <Label Text="{Binding Title}"/>
-                                    <Label Text="{Binding UtensilienLabel}"/>
-                                    <Label Text="{Binding ZutatenLabel}"/>
-                                    <Label Text="{Binding ZeitLabel}"/>
+                                <Image Style="{StaticResource RecipeDetailImageStyle}" Source="dotnet_bot.png"/>
+                                <VerticalStackLayout Grid.Column="1" Style="{StaticResource RecipeDetailVerticalStackStyle}">
+                                    <Label Text="{Binding Title}" Style="{StaticResource RecipeDetailTitleLabelStyle}"/>
+                                    <Label Text="{Binding UtensilienLabel}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>
+                                    <Label Text="{Binding ZutatenLabel}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>
+                                    <Label Text="{Binding ZeitLabel}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
@@ -59,11 +55,11 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Button Text="Neues Rezept erstellen"
+        <!--<Button Text="Neues Rezept erstellen"
                 Command="{Binding GoToCreateRecipeCommand}"
                 Grid.Row="1"
                 Grid.ColumnSpan="2"
-                Margin="10"/>
+                Margin="10"/>-->
         
         <!--<Button Text="Rezepte abfragen"
                 Command="{Binding GetRecipesCommand}"
