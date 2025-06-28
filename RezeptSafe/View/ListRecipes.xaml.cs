@@ -7,15 +7,14 @@ namespace RezeptSafe.View
 {
     public partial class ListRecipesPage : ContentPage
     {
-        private ToolbarItem addRecipeButton;
+        private ToolbarItem _addRecipeButton;
 
         public ListRecipesPage(RecipesViewModel viewModel)
         {
             InitializeComponent();
-            InitializeTheme();
             this.BindingContext = viewModel;
 
-            this.addRecipeButton = new ToolbarItem
+            this._addRecipeButton = new ToolbarItem
             {
                 Text = "+",
                 Command = new Command(async() => { await this.NavigateToCreateRecipeAsync(); })
@@ -27,30 +26,19 @@ namespace RezeptSafe.View
             base.OnAppearing();
 
             (BindingContext as RecipesViewModel)?.GetRecipesCommand.Execute(null);
-            this.ToolbarItems.Add(this.addRecipeButton);
+            this.ToolbarItems.Add(this._addRecipeButton);
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
 
-            this.ToolbarItems.Remove(this.addRecipeButton);
+            this.ToolbarItems.Remove(this._addRecipeButton);
         }
 
         public async Task NavigateToCreateRecipeAsync()
         {
             await Shell.Current.GoToAsync(nameof(CreateRecipePage), true);
-        }
-
-        void InitializeTheme()
-        {
-            string theme = Preferences.Get("AppTheme", "Light");
-            App.Current.UserAppTheme = theme switch
-            {
-                "Dark" => AppTheme.Dark,
-                "Light" => AppTheme.Light,
-                _ => AppTheme.Light
-            };
         }
     }
 }

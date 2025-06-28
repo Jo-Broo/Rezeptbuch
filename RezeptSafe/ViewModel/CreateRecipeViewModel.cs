@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace RezeptSafe.ViewModel
@@ -22,6 +23,9 @@ namespace RezeptSafe.ViewModel
         IRezeptShareService shareService;
 
         [ObservableProperty]
+        bool isScanning = false;
+
+        [ObservableProperty]
         Recipe recipe = new Recipe();
 
         [ObservableProperty]
@@ -30,7 +34,6 @@ namespace RezeptSafe.ViewModel
         ObservableCollection<Utensil> filteredUtensils;
         [ObservableProperty]
         string utensilSearchText;
-
 
         [ObservableProperty]
         ObservableCollection<Ingredient> allIngredients;
@@ -128,12 +131,47 @@ namespace RezeptSafe.ViewModel
         [RelayCommand]
         async Task OnScanQRCodeClicked()
         {
-            await Shell.Current.GoToAsync(nameof(QRCodeScanner), true);
+            try
+            {
+                this.IsScanning = true;
 
-            string? qrcodecontent = await this.shareService.WaitForScanAsync();
+                await Shell.Current.GoToAsync(nameof(QRCodeScanner), true);
 
-            if (!string.IsNullOrEmpty(qrcodecontent))
-                await this.alertService.ShowAlertAsync("Barcode detected", qrcodecontent);
+                string? qrcodecontent = await this.shareService.WaitForScanAsync();
+
+                if (!string.IsNullOrEmpty(qrcodecontent))
+                {
+                    string recipeJSON = this.shareService.DecompressBase64ToJson(qrcodecontent);
+
+                    Recipe? newRecipe = JsonSerializer.Deserialize<Recipe>(recipeJSON);
+
+                    if (newRecipe != null)
+                    {
+                        if (await this.alertService.ShowAlertWithChoiceAsync($"Rezept {newRecipe.Title} erkannt", "Wollen sie das Rezept übernehmen", "Ja", "Nein"))
+                        {
+                            await this.rezeptService.AddExternalRecipeAsync(newRecipe);
+                            await this.alertService.ShowAlertAsync("Rezept erfolgreich eingefügt", "");
+
+                            // Wenn das Rezept hinzugefügt wurde dann geht es zurück auf die Startseite
+                            await Shell.Current.GoToAsync("..");
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                this.IsScanning = false;
+            }
+        }
+
+        partial void OnIsScanningChanged(bool oldValue, bool newValue)
+        {
+            this.ScanQRCodeClickedCommand.NotifyCanExecuteChanged();
         }
 
         [RelayCommand]

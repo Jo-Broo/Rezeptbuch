@@ -93,6 +93,12 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                   IsRunning="{Binding IsBusy}"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Center"
+                   Grid.RowSpan="2"
+                   Grid.ColumnSpan="2"/>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

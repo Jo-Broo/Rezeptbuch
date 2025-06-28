@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui.Views;
+﻿using CommunityToolkit.Maui.Views;
 using RezeptSafe.Interfaces;
 using System.Threading.Tasks;
 using ZXing.Net.Maui;
@@ -8,6 +8,8 @@ namespace RezeptSafe.View;
 public partial class QRCodeScanner : ContentPage
 {
     private IRezeptShareService shareService;
+
+    private bool _hasNavigatedBack;
 
     public QRCodeScanner(IRezeptShareService shareService)
     {
@@ -23,15 +25,30 @@ public partial class QRCodeScanner : ContentPage
         };
     }
 
-    private bool _alreadyClosed = false;
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
 
-    private async void barcodeReader_BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
+        if (!this._hasNavigatedBack)
+        {
+            // Das ScanEvent hat noch keinen Barcode gelesen, die Seite wird aber bereits geschlossen
+            // d.h. der Nutzer selbst hat den Vorgang abgebrochen
+            this.shareService.CompleteScan(null);
+        }
+    }
+
+    private async void BarcodesDetected(object sender, BarcodeDetectionEventArgs e)
     {
         var first = e.Results.FirstOrDefault();
-        if (first is not null)
+        if (first is null || this._hasNavigatedBack)
         {
-            this.shareService.CompleteScan(first.Value);
-            await Shell.Current.GoToAsync("..");
+            return;
         }
+
+        this._hasNavigatedBack = true;
+
+        this.shareService.CompleteScan(first.Value);
+
+        await MainThread.InvokeOnMainThreadAsync(async () => { await Shell.Current.Navigation.PopAsync(); });
     }
 }

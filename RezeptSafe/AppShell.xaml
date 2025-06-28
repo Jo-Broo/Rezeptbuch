@@ -7,15 +7,9 @@
     Shell.FlyoutBehavior="Disabled" BackgroundColor="{StaticResource Android}">
 
     <Shell.ToolbarItems>
-        <ToolbarItem x:Name="ThemeButton" Text="test" Clicked="ToolbarItem_Clicked"/>
+        <!--<ToolbarItem x:Name="ThemeButton" Text="test" Clicked="ToolbarItem_Clicked"/>-->
         <!--<ToolbarItem x:Name="AddRecipe" Text="+"/>-->
     </Shell.ToolbarItems>
     
     <ShellContent Title="Start" ContentTemplate="{ DataTemplate view:LandingPage}"/>
-
-    <!--<FlyoutItem Title="Home" FlyoutDisplayOptions="AsMultipleItems" >
-        <ShellContent Title="Home" ContentTemplate="{DataTemplate view:MainPage}" Route="MainPage" />
-        <ShellContent Title="Einstellungen" ContentTemplate="{DataTemplate view:SettingsPage}" Route="SettingsPage" />
-        <ShellContent Title="Profil" ContentTemplate="{DataTemplate view:ProfilPage}" Route="ProfilPage" />
-    </FlyoutItem>-->
 </Shell>
