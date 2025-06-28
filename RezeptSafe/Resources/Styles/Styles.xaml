@@ -459,8 +459,8 @@
     <!-- Create-->
 
     <Style x:Key="RecipeCreateFrameStyle" TargetType="Frame">
-        <Setter Property="HeightRequest" Value="250" />
-        <Setter Property="Padding" Value="5" />
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="Padding" Value="10" />
         <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=White, Dark=#222222}" />
         <Setter Property="BorderColor" Value="{AppThemeBinding Light=#DDD, Dark=#555}" />
         <Setter Property="CornerRadius" Value="10" />
@@ -474,8 +474,21 @@
     </Style>
 
     <Style x:Key="RecipeCreateInfoLabelStyle" TargetType="Label">
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#555555, Dark=#AAAAAA}" />
+    </Style>
+
+    <Style x:Key="RecipeCreateEntry" TargetType="Entry">
         <Setter Property="FontSize" Value="14" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light=#555555, Dark=#AAAAAA}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light=#222222, Dark=White}" />
+    </Style>
+
+    <Style x:Key="RecipeCreateEditor" TargetType="Editor">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#555555, Dark=#AAAAAA}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light=#222222, Dark=White}" />
+        <Setter Property="AutoSize" Value="TextChanges"/>
+        <Setter Property="MaximumHeightRequest" Value="300" />
     </Style>
 
     <Style x:Key="RecipeCreateImageStyle" TargetType="Image">
@@ -486,6 +499,7 @@
 
     <Style x:Key="RecipeCreateVerticalStackStyle" TargetType="VerticalStackLayout">
         <Setter Property="Spacing" Value="11" />
+        <Setter Property="Grid.ColumnSpan" Value="2" />
     </Style>
 
 </ResourceDictionary>

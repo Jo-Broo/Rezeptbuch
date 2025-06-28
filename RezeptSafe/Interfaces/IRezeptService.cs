@@ -28,6 +28,7 @@ namespace RezeptSafe.Interfaces
         Task<int> RemoveAllIngredientsFromRecipeAsync(int recipeID);
         Task<Ingredient?> IngredientPresentInDatabase(Ingredient ingredient);
         Task<int> GetLastIngredientIDAsync();
+        Task<List<Unit>> GetAllUnitsAsync();
  
         // Utensilien
         Task<List<Utensil>> GetAllUtensilsAsync();

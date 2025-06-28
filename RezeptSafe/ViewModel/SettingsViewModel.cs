@@ -127,17 +127,17 @@ namespace RezeptSafe.ViewModel
                             foreach (var utensil in recipe.Utensils)
                             {
                                 Utensil availableUtensil = await this.rezeptService.UtensilPresentInDatabase(utensil);
-                                if (availableUtensil.Id > 0)
+                                if (availableUtensil.ID > 0)
                                 {
                                     // Utensil ist bereits vorhanden und kann aus der Liste der neuen Utensilien entfernt werden
                                     newUtensils.Remove(utensil);
                                     // Die ID des Utensils muss jetzt noch aktualisiert werden
-                                    utensil.Id = availableUtensil.Id;
+                                    utensil.ID = availableUtensil.ID;
                                 }
                                 else
                                 {
                                     await this.rezeptService.AddUtensilAsync(utensil);
-                                    utensil.Id = await this.rezeptService.GetLastUtensilIDAsync();
+                                    utensil.ID = await this.rezeptService.GetLastUtensilIDAsync();
                                 }
                                 await popup.PerformStep();
                             }
@@ -167,7 +167,7 @@ namespace RezeptSafe.ViewModel
                         foreach (var utensil in newUtensils)
                         {
                             Utensil availableUtensil = await this.rezeptService.UtensilPresentInDatabase(utensil);
-                            if (availableUtensil.Id == -1)
+                            if (availableUtensil.ID == -1)
                             {
                                 // Utensil ist nicht in der Datenbank vorhanden und muss hinzugefügt werden
                                 await this.rezeptService.AddUtensilAsync(utensil);

@@ -5,7 +5,7 @@
              xmlns:model="clr-namespace:RezeptSafe.Model"
              x:Class="RezeptSafe.View.DetailsPage"
              x:DataType="viewmodel:RecipeDetailsViewModel"
-             Title="{Binding Recipe.Title}">
+             Title="{Binding Recipe.TITLE}">
 
     <Grid RowDefinitions="*,auto">
         <ScrollView Grid.Row="0">
@@ -32,7 +32,7 @@
                 </CollectionView>
                 <Label Text="{Binding Recipe.ZeitLabel}" Margin="5"/>
                 <Border BackgroundColor="White" HeightRequest="2"/>
-                <Label Text="{Binding Recipe.Description}" Margin="5"/>
+                <Label Text="{Binding Recipe.DESCRIPTION}" Margin="5"/>
             </VerticalStackLayout>
         </ScrollView>
         <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQRClickedCommand}"/>

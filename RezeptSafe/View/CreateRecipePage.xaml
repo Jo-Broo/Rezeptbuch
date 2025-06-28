@@ -6,99 +6,167 @@
              x:DataType="viewmodel:CreateRecipeViewModel"
              Title="{Binding Title}">
 
-    <ScrollView>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Button Text="&#xf060;" FontFamily="FontAwesomeSolid" Grid.Row="0" Grid.Column="0" Margin="10" IsVisible="{Binding IsBackVisible}" Command="{Binding StepBackAsyncCommand}"/>
+        <Button Text="&#xf061;" FontFamily="FontAwesomeSolid" Grid.Row="0" Grid.Column="1" Margin="10" IsVisible="{Binding IsForwardVisible}" Command="{Binding StepVorwardAsyncCommand}"/>
+
+        <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=1}">
+            <VerticalStackLayout>
+                <Label Text="Rezeptname:" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <Entry Placeholder="Titel" Text="{Binding Recipe.TITLE}" Style="{StaticResource RecipeCreateEntry}"/>
+                <Label Text="Beschreibung:" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <Editor Placeholder="Beschreibung" Text="{Binding Recipe.DESCRIPTION}" Style="{StaticResource RecipeCreateEditor}"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=2}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Text="Zutaten:" Grid.Row="0" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <SearchBar Placeholder="Suchfeld" Grid.Row="1" Text="{Binding IngredientSearchText}" Style="{StaticResource RecipeCreateTitleLabelStyle}" />
+                <CollectionView Grid.Row="2" ItemsSource="{Binding FilteredIngredients}" 
+                    SelectionMode="Multiple"
+                    SelectionChanged="OnIngredientsSelectionChanged">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Ingredient">
+                    
+                    <Grid ColumnDefinitions="auto,*,100">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal"/>
+                                        <VisualState Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="LightBlue" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Label Text="{Binding NAME}" Grid.Column="0" Style="{StaticResource RecipeCreateInfoLabelStyle}" FontSize="36"/>
+                        <HorizontalStackLayout Grid.Column="2" IsVisible="{Binding IsSelected}">
+                            <Entry Keyboard="Numeric" WidthRequest="50" Text="{Binding AMOUNT}"/>
+                            <Picker Title="Einheit" WidthRequest="50" ItemsSource="{Binding Units}" ItemDisplayBinding="{Binding UNIT}" SelectedItem="{Binding SelectedUnit}"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+            </Grid>
+        </Frame>
+
+        <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=3}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Label Text="Utensilien:" Grid.Row="0" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <SearchBar Placeholder="Suchfeld" Grid.Row="1" Text="{Binding UtensilSearchText}" Style="{StaticResource RecipeCreateTitleLabelStyle}" />
+                <CollectionView Grid.Row="2" ItemsSource="{Binding FilteredUtensils}" 
+            SelectionMode="Multiple"
+            SelectionChanged="OnUtensilsSelectionChanged">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Utensil">
+                            <Grid ColumnDefinitions="auto,*,50">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup Name="CommonStates">
+                                        <VisualState Name="Normal"/>
+                                        <VisualState Name="Selected">
+                                            <VisualState.Setters>
+                                                <Setter Property="BackgroundColor" Value="LightBlue" />
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+                                <Label Text="{Binding NAME}" Grid.Column="0" Style="{StaticResource RecipeCreateInfoLabelStyle}" FontSize="36"/>
+                                <HorizontalStackLayout Grid.Column="2" IsVisible="{Binding IsSelected}">
+                                    <Entry Keyboard="Numeric" WidthRequest="50" Text="{Binding AMOUNT}"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Frame>
+
+        <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=4}">
+            <Grid RowDefinitions="auto,auto,auto,auto,auto">
+                <Label Text="Zeitangabe:" Grid.Row="0" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.TIME}" Grid.Row="1" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
+                <Label Text="Ersteller:" Grid.Row="2" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <Label Text="{Binding Recipe.USERNAME}" Grid.Row="3" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
+                <Button Text="Rezept speichern" Command="{Binding SaveClickedCommand}" Grid.Row="4"/>
+            </Grid>
+        </Frame>
+
+
+        <VerticalStackLayout Style="{StaticResource RecipeCreateVerticalStackStyle}" Grid.Row="1">
+            
+
+            
+
+            <!--<Frame Style="{StaticResource RecipeCreateFrameStyle}">
+        <VerticalStackLayout>
+            <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
+                <Label Text="Utensilien" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+            </Grid>
+            <CollectionView ItemsSource="{Binding FilteredUtensils}" 
+                    SelectionMode="Multiple"
+                    HeightRequest="300"
+                    SelectionChanged="OnUtensilsSelectionChanged">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Utensil">
+                        <Grid ColumnDefinitions="auto,*,100">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal"/>
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="LightBlue" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
+                            <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </Frame>-->
+
+            <!--<Frame Style="{StaticResource RecipeCreateFrameStyle}">
         <VerticalStackLayout Spacing="10">
-            <!--<Button Text="Aus CR-Code" Margin="10" FontSize="20" Command="{Binding ScanQRCodeClickedCommand}"/>-->
-            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
-                <VerticalStackLayout>
-                    <Label Text="Rezeptname" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                    <Entry Placeholder="Titel" Text="{Binding Recipe.Title}" PlaceholderColor="Black"/>
-                    <Label Text="Beschreibung" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                    <Editor Placeholder="Beschreibung" Text="{Binding Recipe.Description}" PlaceholderColor="Black"/>
-                </VerticalStackLayout>
-            </Frame>
+            <Label Text="Zeitangabe:" FontSize="20" Grid.Column="0"/>
+            <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.Time}"/>
+            <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
+            <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1" TextColor="White"/>
+            <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
+        </VerticalStackLayout>
+    </Frame>-->
 
-            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
-                <VerticalStackLayout>
-                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                        <Label Text="Zutaten" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                        <SearchBar Placeholder="Suchfeld" Text="{Binding IngredientSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                    </Grid>
+        </VerticalStackLayout>
+        
 
-                    <CollectionView ItemsSource="{Binding FilteredIngredients}" 
-                                    SelectionMode="Multiple"
-                                    HeightRequest="300"
-                                    SelectionChanged="OnIngredientsSelectionChanged">   
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:Ingredient">
-                                <Grid ColumnDefinitions="auto,*,100">
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroup Name="CommonStates">
-                                            <VisualState Name="Normal"/>
-                                            <VisualState Name="Selected">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="LightBlue" />
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateManager.VisualStateGroups>
-                                    <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
-                                    <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </Frame>
-
-            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
-                <VerticalStackLayout>
-                    <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                        <Label Text="Utensilien" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                        <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                    </Grid>
-                    <CollectionView ItemsSource="{Binding FilteredUtensils}" 
-                                    SelectionMode="Multiple"
-                                    HeightRequest="300"
-                                    SelectionChanged="OnUtensilsSelectionChanged">  
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:Utensil">
-                                <Grid ColumnDefinitions="auto,*,100">
-                                    <VisualStateManager.VisualStateGroups>
-                                        <VisualStateGroup Name="CommonStates">
-                                            <VisualState Name="Normal"/>
-                                            <VisualState Name="Selected">
-                                                <VisualState.Setters>
-                                                    <Setter Property="BackgroundColor" Value="LightBlue" />
-                                                </VisualState.Setters>
-                                            </VisualState>
-                                        </VisualStateGroup>
-                                    </VisualStateManager.VisualStateGroups>
-                                    <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
-                                    <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </Frame>
-
-            <Frame Style="{StaticResource RecipeCreateFrameStyle}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Zeitangabe:" FontSize="20" Grid.Column="0"/>
-                    <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.Time}"/>
-                    <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
-                    <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1" TextColor="White"/>
-                    <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
-                </VerticalStackLayout>
-            </Frame>
-
-            <ActivityIndicator IsVisible="{Binding IsBusy}"
+        <ActivityIndicator IsVisible="{Binding IsBusy}"
                    IsRunning="{Binding IsBusy}"
                    HorizontalOptions="Fill"
-                   VerticalOptions="Center"
-                   Grid.RowSpan="2"
-                   Grid.ColumnSpan="2"/>
-        </VerticalStackLayout>
-    </ScrollView>
+                   VerticalOptions="Center"/>
+    </Grid>
 </ContentPage>

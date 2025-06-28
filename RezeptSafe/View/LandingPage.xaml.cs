@@ -14,7 +14,7 @@ public partial class LandingPage : ContentPage
 
         this._themeButton = new ToolbarItem
         {
-            Text = "+",
+            IconImageSource = "sun.svg",
             Command = new Command(() => { this.ToolbarItem_Clicked(this,EventArgs.Empty); })
         };
     }
@@ -23,7 +23,7 @@ public partial class LandingPage : ContentPage
     {
         base.OnAppearing();
 
-        this._themeButton.Text = (App.Current.UserAppTheme == AppTheme.Dark) ? "☀️" : "🌙";
+        this._themeButton.IconImageSource = (App.Current.UserAppTheme == AppTheme.Dark) ? "sun.svg" : "moon.svg";
 
         this.ToolbarItems.Add(this._themeButton);
     }
@@ -45,7 +45,7 @@ public partial class LandingPage : ContentPage
 
             Preferences.Set("AppTheme", App.Current.UserAppTheme.ToString());
 
-            this._themeButton.Text = (App.Current.UserAppTheme == AppTheme.Dark) ? "☀️" : "🌙";
+            this._themeButton.IconImageSource = (App.Current.UserAppTheme == AppTheme.Dark) ? "sun.svg" : "moon.svg";
         }
         catch (Exception ex)
         {

@@ -15,8 +15,8 @@ public partial class CreateRecipePage : ContentPage
 
         this._qrScannerButton = new ToolbarItem
         {
-            Text = "qr",
-            Command = vm.ScanQRCodeClickedCommand
+            IconImageSource = "qrcode.svg",
+            Command = vm.ScanQRCodeClickedCommand         
         };
     }
 
@@ -24,8 +24,16 @@ public partial class CreateRecipePage : ContentPage
     {
         base.OnAppearing();
 
+        _ = DelayedInitializeAsync();
+
         if (!this.ToolbarItems.Contains(this._qrScannerButton))
             this.ToolbarItems.Add(this._qrScannerButton);
+    }
+
+    private async Task DelayedInitializeAsync()
+    {
+        //await Task.Delay(500); // lässt UI vorher rendern
+        (BindingContext as CreateRecipeViewModel)?.InitializeCommand.Execute(null);
     }
 
     protected override void OnDisappearing()

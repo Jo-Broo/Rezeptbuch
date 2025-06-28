@@ -44,6 +44,11 @@ namespace RezeptSafe.Services
         }
         public async Task CloseConnection()
         {
+            if(this._connection is null)
+            {
+                return;
+            }
+            
             await this._connection.CloseAsync();
         }
         public async Task<int> InitializeDataBase()
@@ -82,7 +87,7 @@ namespace RezeptSafe.Services
                                                     RECIPEID INTEGER,
                                                     INGREDIENTID INTEGER,
                                                     AMOUNT FLOAT,
-                                                    UNIT VARCHAR
+                                                    UNITID INTEGER
                                                 );";
                 await conn.ExecuteAsync(sql);
 
@@ -92,6 +97,12 @@ namespace RezeptSafe.Services
                                                     UTENSILID INTEGER,
                                                     AMOUNT INTEGER
                                                 );";
+                await conn.ExecuteAsync(sql);
+
+                sql = @"CREATE TABLE IF NOT EXISTS UNIT (
+                                                    ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                                    UNIT VARCHAR);";
+
                 await conn.ExecuteAsync(sql);
 
                 sql = @"INSERT INTO Utensil (name) VALUES
@@ -308,6 +319,10 @@ namespace RezeptSafe.Services
                                                 ('Feldsalat');";
                 await conn.ExecuteAsync(sql);
 
+                sql = @"INSERT INTO UNIT(UNIT) VALUES('g'),
+                                                     ('Prise');";
+                await conn.ExecuteAsync(sql);
+
                 return 1;
             }
             catch (Exception ex)
@@ -375,7 +390,7 @@ namespace RezeptSafe.Services
                 string sql = @"INSERT INTO RECIPE(TITLE,DESCRIPTION,TIME,USERNAME,IMAGEPATH) 
                                VALUES
                                 (?,?,?,?,?)";
-                var result = await conn.ExecuteAsync(sql,recipe.Title,recipe.Description,recipe.Time,recipe.Username,recipe.ImagePath);
+                var result = await conn.ExecuteAsync(sql,recipe.TITLE,recipe.DESCRIPTION,recipe.TIME,recipe.USERNAME,recipe.IMAGEPATH);
 
                 if(result == 1)
                 {
@@ -385,15 +400,19 @@ namespace RezeptSafe.Services
 
                     foreach (var ingredient in recipe.Ingredients)
                     {
-                        tasks.Add(this.AddIngredientToRecipeAsync(recipe.Id, ingredient));
+                        if(await this.AddIngredientToRecipeAsync(recipe.Id, ingredient) == -1)
+                        {
+                            throw new Exception("Beim einfügen in die RecipeIngredient Tabelle ist ein Fehler aufgetreten");
+                        }
                     }
 
                     foreach (var utensil in recipe.Utensils)
                     {
-                        tasks.Add(this.AddUtensilToRecipeAsync(recipe.Id,utensil));
+                        if(await this.AddUtensilToRecipeAsync(recipe.Id, utensil) == -1)
+                        {
+                            throw new Exception("Beim einfügen in die RecipeUtensil Tabelle ist ein Fehler aufgetreten");
+                        }
                     }
-
-                    await Task.WhenAll(tasks);
 
                     return 1;
                 }
@@ -419,7 +438,7 @@ namespace RezeptSafe.Services
                                 IMAGEPATH = ?)
                                WHERE
                                 ID = ?";
-                var result = await conn.ExecuteAsync(sql, recipe.Title, recipe.Description, recipe.Time, recipe.Username, recipe.ImagePath, recipe.Id);
+                var result = await conn.ExecuteAsync(sql, recipe.TITLE, recipe.DESCRIPTION, recipe.TIME, recipe.USERNAME, recipe.IMAGEPATH, recipe.Id);
 
                 if (result == 1)
                 {
@@ -505,7 +524,7 @@ namespace RezeptSafe.Services
                 List<Ingredient> internalIngredients = new List<Ingredient>();
                 foreach (Ingredient ingredient in recipe.Ingredients)
                 {
-                    if(string.IsNullOrWhiteSpace(ingredient.Name) || ingredient.Amount <= 0)
+                    if(string.IsNullOrWhiteSpace(ingredient.NAME) || ingredient.AMOUNT <= 0)
                     {
                         throw new InvalidOperationException("Non Valid Ingredient found");
                     }
@@ -519,15 +538,15 @@ namespace RezeptSafe.Services
                         tmp = ingredient;
                     }
                     // Zutat ist bereits vorhanden
-                    tmp.Amount = ingredient.Amount;
-                    tmp.Unit = ingredient.Unit;
+                    tmp.AMOUNT = ingredient.AMOUNT;
+                    tmp.UNIT = ingredient.UNIT;
                     internalIngredients.Add(tmp);
                 }
 
                 List<Utensil> internalUtensils = new List<Utensil>();
                 foreach (Utensil utensil in recipe.Utensils)
                 {
-                    if (string.IsNullOrWhiteSpace(utensil.Name) || utensil.Amount <= 0)
+                    if (string.IsNullOrWhiteSpace(utensil.NAME) || utensil.AMOUNT <= 0)
                     {
                         throw new InvalidOperationException("Non Valid Utensil found");
                     }
@@ -537,11 +556,11 @@ namespace RezeptSafe.Services
                     {
                         // Utensil muss noch erstellt werden
                         await this.AddUtensilAsync(utensil);
-                        utensil.Id = await this.GetLastUtensilIDAsync();
+                        utensil.ID = await this.GetLastUtensilIDAsync();
                         tmp = utensil;
                     }
                     // Utensil ist bereits vorhanden
-                    tmp.Amount = utensil.Amount;
+                    tmp.AMOUNT = utensil.AMOUNT;
                     internalUtensils.Add(tmp);
                 }
 
@@ -581,7 +600,7 @@ namespace RezeptSafe.Services
 
                 string sql = @"INSERT INTO INGREDIENT (NAME, DESCRIPTION ) VALUES (?, ?)";
 
-                return await conn.ExecuteAsync(sql, ingredient.Name, ingredient.Description);
+                return await conn.ExecuteAsync(sql, ingredient.NAME, ingredient.DESCRIPTION);
             }
             catch (Exception ex)
             {
@@ -613,11 +632,13 @@ namespace RezeptSafe.Services
 
                 string sql = @"SELECT
                                     i.*,
-                                    ri.UNIT,
+                                    u.ID AS UNITID,
+                                    u.UNIT,
                                     ri.AMOUNT
                                 FROM
                                     RECIPEINGREDIENT ri
                                     LEFT JOIN INGREDIENT i ON i.ID = ri.INGREDIENTID
+                                    LEFT JOIN UNIT u ON u.ID = ri.UNITID 
                                 WHERE
                                     ri.RECIPEID = ?;
                                 ";
@@ -636,9 +657,16 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
 
-                string sql = @"INSERT INTO RECIPEINGREDIENT(RECIPEID,INGREDIENTID,AMOUNT,UNIT) VALUES (?,?,?,?)";
+                var unit = ingredient.SelectedUnit;
 
-                return await conn.ExecuteAsync(sql, recipeId,ingredient.Id,ingredient.Amount,ingredient.Unit);
+                if(unit is null)
+                {
+                    throw new Exception("Keine Einheit ausgewählt");
+                }
+
+                string sql = @"INSERT INTO RECIPEINGREDIENT(RECIPEID,INGREDIENTID,AMOUNT,UNITID) VALUES (?,?,?,?)";
+
+                return await conn.ExecuteAsync(sql, recipeId,ingredient.Id,ingredient.AMOUNT,unit.ID);
             }
             catch (Exception ex)
             {
@@ -700,11 +728,11 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
                 string sql = @"SELECT * FROM INGREDIENT WHERE LOWER(NAME) LIKE LOWER(?)";
-                result = (await conn.QueryAsync<Ingredient>(sql, ingredient.Name)).FirstOrDefault();
+                result = (await conn.QueryAsync<Ingredient>(sql, ingredient.NAME)).FirstOrDefault();
 
                 if(result == null)
                 {
-                    throw new Exception($"Keine Zutat mit dem Namen [{ingredient.Name}] gefunden");
+                    throw new Exception($"Keine Zutat mit dem Namen [{ingredient.NAME}] gefunden");
                 }
             }
             catch (Exception ex)
@@ -734,6 +762,26 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<List<Unit>> GetAllUnitsAsync()
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT ID,UNIT FROM UNIT";
+                var result = await conn.QueryAsync<Unit>(sql);
+
+                if (result == null)
+                    throw new Exception("Keine Einheiten gefunden");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return new List<Unit>();
+            }
+        }
 
         public async Task<int> AddUtensilAsync(Utensil utensil)
         {
@@ -743,7 +791,7 @@ namespace RezeptSafe.Services
 
                 string sql = @"INSERT INTO UTENSIL (NAME, DESCRIPTION) VALUES (?, ?)";
 
-                return await conn.ExecuteAsync(sql, utensil.Name, utensil.Description);
+                return await conn.ExecuteAsync(sql, utensil.NAME, utensil.DESRIPTION);
             }
             catch (Exception ex)
             {
@@ -799,7 +847,7 @@ namespace RezeptSafe.Services
 
                 string sql = @"INSERT INTO RECIPEUTENSIL(RECIPEID,UTENSILID,AMOUNT) VALUES (?,?,?)";
 
-                return await conn.ExecuteAsync(sql, recipeId, utensil.Id, utensil.Amount);
+                return await conn.ExecuteAsync(sql, recipeId, utensil.ID, utensil.AMOUNT);
             }
             catch (Exception ex)
             {
@@ -845,11 +893,11 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
                 string sql = @"SELECT * FROM UTENSIL WHERE LOWER(NAME) LIKE LOWER(?)";
-                result = (await conn.QueryAsync<Utensil>(sql, utensil.Name)).FirstOrDefault();
+                result = (await conn.QueryAsync<Utensil>(sql, utensil.NAME)).FirstOrDefault();
 
                 if (result == null)
                 {
-                    throw new Exception($"Kein Utensil mit dem Namen [{utensil.Name}] gefunden");
+                    throw new Exception($"Kein Utensil mit dem Namen [{utensil.NAME}] gefunden");
                 }
             }
             catch (Exception ex)

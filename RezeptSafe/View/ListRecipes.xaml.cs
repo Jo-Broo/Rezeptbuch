@@ -16,7 +16,7 @@ namespace RezeptSafe.View
 
             this._addRecipeButton = new ToolbarItem
             {
-                Text = "+",
+                IconImageSource = "plus.svg",
                 Command = new Command(async() => { await this.NavigateToCreateRecipeAsync(); })
             };
         }

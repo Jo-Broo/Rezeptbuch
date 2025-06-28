@@ -12,6 +12,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace RezeptSafe.ViewModel
@@ -42,61 +43,96 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         string ingredientSearchText;
 
+        [ObservableProperty]
+        ObservableCollection<Unit> allUnits;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsBackVisible))]
+        [NotifyPropertyChangedFor(nameof(IsForwardVisible))]
+        int step;
+
+        // Schritt 1: Titel und Beschreibung einfügen
+        // Schritt 2: Zutaten auswählen
+        // Schritt 3: Utensilien hinzufügen
+        // Schritt 4: Zeitangabe machen und speichern
+        const int maxSteps = 4;
+
+        public bool IsBackVisible => (this.Step > 1);
+
+        public bool IsForwardVisible => (this.Step < maxSteps);
+
         public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService, IRezeptShareService shareService) : base(alertService) 
         {
             this.rezeptService = rezeptservice;
             this.userService = userService;
             this.shareService = shareService;
 
-            this.Recipe.Username = this.userService.GetUsername();
+            this.Recipe.USERNAME = this.userService.GetUsername();
 
             this.AllIngredients = new ObservableCollection<Ingredient>();
             this.FilteredIngredients = new ObservableCollection<Ingredient>();
             this.AllUtensils = new ObservableCollection<Utensil>();
             this.FilteredUtensils = new ObservableCollection<Utensil>();
+            this.AllUnits = new ObservableCollection<Unit>();
             this.IngredientSearchText = string.Empty;
             this.UtensilSearchText = string.Empty;
 
-            this.QueryAllIngredients();
-            this.QueryAllUtensils();
+            OnPropertyChanged(nameof(IsBackVisible));
         }
 
         partial void OnIngredientSearchTextChanged(string value)
         {
             FilterIngredients(value);
         }
-
-        void FilterIngredients(string query)
-        {
-            if (string.IsNullOrWhiteSpace(query))
-            {
-                FilteredIngredients = new ObservableCollection<Ingredient>(AllIngredients);
-            }
-            else
-            {
-                FilteredIngredients = new ObservableCollection<Ingredient>(
-                    AllIngredients.Where(i => i.Name.Contains(query, StringComparison.OrdinalIgnoreCase)));
-            }
-        }
         partial void OnUtensilSearchTextChanged(string value)
         {
             FilterUtensils(value);
         }
 
-        void FilterUtensils(string query)
+        void FilterIngredients(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            this.IsBusy = true;
+            this.FilteredIngredients.Clear();
+
+            if (!string.IsNullOrWhiteSpace(query))
             {
-                FilteredUtensils = new ObservableCollection<Utensil>(AllUtensils);
+                Regex regex = new Regex($"^{Regex.Escape(query)}.*$", RegexOptions.IgnoreCase);
+
+                this.FilteredIngredients = new ObservableCollection<Ingredient>(this.AllIngredients.Where(i => regex.IsMatch(i.NAME)));
             }
             else
             {
-                FilteredUtensils = new ObservableCollection<Utensil>(
-                    AllUtensils.Where(i => i.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase)));
+                foreach (var ingredient in this.AllIngredients.Where(i => i.IsSelected))
+                {
+                    this.FilteredIngredients.Add(ingredient);
+                }
             }
+            
+            this.IsBusy = false;
+        }
+        void FilterUtensils(string query)
+        {
+            this.IsBusy = true;
+            this.FilteredUtensils.Clear();
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                Regex regex = new Regex($"^{Regex.Escape(query)}.*$", RegexOptions.IgnoreCase);
+
+                this.FilteredUtensils = new ObservableCollection<Utensil>(this.AllUtensils.Where(i => regex.IsMatch(i.NAME)));
+            }
+            else
+            {
+                foreach (var utensil in this.AllUtensils.Where(i => i.IsSelected))
+                {
+                    this.FilteredUtensils.Add(utensil);
+                }
+            }
+
+            this.IsBusy = false;
         }
 
-        public async void QueryAllIngredients()
+        public async Task QueryAllIngredients()
         {
             var ingredients = await this.rezeptService.GetAllIngredientsAsync();
 
@@ -108,11 +144,10 @@ namespace RezeptSafe.ViewModel
             foreach (var ingredient in ingredients)
             {
                 this.AllIngredients?.Add(ingredient);
-                this.FilteredIngredients?.Add(ingredient);
             }
         }
 
-        public async void QueryAllUtensils()
+        public async Task QueryAllUtensils()
         {
             var utensils = await this.rezeptService.GetAllUtensilsAsync();
 
@@ -124,7 +159,31 @@ namespace RezeptSafe.ViewModel
             foreach (var utensil in utensils)
             {
                 this.AllUtensils?.Add(utensil);
-                this.FilteredUtensils?.Add(utensil);
+            }
+        }
+
+        public async Task QueryAllUnits()
+        {
+            var units = await this.rezeptService.GetAllUnitsAsync();
+
+            if(this.AllUnits?.Count != 0)
+            {
+                this.AllUnits?.Clear();
+            }
+
+            foreach (var unit in units)
+            {
+                this.AllUnits?.Add(unit);
+            }
+
+            if(this.AllUnits is null)
+            {
+                return;
+            }
+
+            foreach (var ingredient in this.AllIngredients)
+            {
+                ingredient.Units = this.AllUnits;
             }
         }
 
@@ -145,9 +204,11 @@ namespace RezeptSafe.ViewModel
 
                     Recipe? newRecipe = JsonSerializer.Deserialize<Recipe>(recipeJSON);
 
-                    if (newRecipe != null)
+                    string error = string.Empty;
+
+                    if (newRecipe != null && newRecipe.IsValidRecipe(out error))
                     {
-                        if (await this.alertService.ShowAlertWithChoiceAsync($"Rezept {newRecipe.Title} erkannt", "Wollen sie das Rezept übernehmen", "Ja", "Nein"))
+                        if (await this.alertService.ShowAlertWithChoiceAsync($"Rezept {newRecipe.TITLE} erkannt", "Wollen sie das Rezept übernehmen", "Ja", "Nein"))
                         {
                             await this.rezeptService.AddExternalRecipeAsync(newRecipe);
                             await this.alertService.ShowAlertAsync("Rezept erfolgreich eingefügt", "");
@@ -155,6 +216,10 @@ namespace RezeptSafe.ViewModel
                             // Wenn das Rezept hinzugefügt wurde dann geht es zurück auf die Startseite
                             await Shell.Current.GoToAsync("..");
                         }
+                    }
+                    else
+                    {
+                        await this.alertService.ShowAlertAsync("Error", error);
                     }
 
                 }
@@ -187,9 +252,57 @@ namespace RezeptSafe.ViewModel
                 return;
             }
 
-            await this.rezeptService.AddRecipeAsync(this.Recipe);
+            if(await this.rezeptService.AddRecipeAsync(this.Recipe) == -1)
+            {
+                await this.alertService.ShowAlertAsync("Error", "Beim erstellen des Rezeptes ist ein Fehler aufgetreten");
+            }
+            else
+            {
+                await Shell.Current.GoToAsync("..");
+            }
+        }
 
-            await Shell.Current.GoToAsync("..");
+        [RelayCommand]
+        async Task InitializeAsync()
+        {
+            if (this.IsBusy)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                this.Step = 1;
+                this.Title = $"Schritt: 1/{CreateRecipeViewModel.maxSteps}";
+
+                await this.QueryAllIngredients();
+                await this.QueryAllUtensils();
+                await this.QueryAllUnits();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        void StepVorwardAsync() 
+        {
+            this.Step++;
+            this.Title = $"Schritt: {this.Step}/{CreateRecipeViewModel.maxSteps}";
+        }
+        
+        [RelayCommand]
+        void StepBackAsync() 
+        {
+            this.Step--;
+            this.Title = $"Schritt: {this.Step}/{CreateRecipeViewModel.maxSteps}";
         }
     }
 }

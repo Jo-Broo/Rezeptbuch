@@ -2,6 +2,7 @@
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,15 +12,20 @@ namespace RezeptSafe.Model
     public partial class Ingredient : ObservableObject
     {
         public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public double Amount { get; set; }
-        public string Unit { get; set; } = "g";
+        public string NAME { get; set; } = string.Empty;
+        public string DESCRIPTION { get; set; } = string.Empty;
+        public double AMOUNT { get; set; }
+        public int UNITID { get; set; }
+        public string UNIT { get; set; } = string.Empty;
+        [ObservableProperty]
+        Unit selectedUnit;
         [ObservableProperty]
         bool isSelected;
+        [ObservableProperty]
+        ObservableCollection<Unit> units;
         public override string ToString()
         {
-            return $"{Amount}{Unit} {Name}";
+            return $"{this.AMOUNT}{this.UNIT} {this.NAME}";
         }
     }
 

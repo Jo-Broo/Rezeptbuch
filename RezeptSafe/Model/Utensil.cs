@@ -11,15 +11,15 @@ namespace RezeptSafe.Model
     
     public partial class Utensil : ObservableObject
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public int Amount { get; set; }
+        public int ID { get; set; }
+        public string NAME { get; set; } = string.Empty;
+        public string DESRIPTION { get; set; } = string.Empty;
+        public int AMOUNT { get; set; }
         [ObservableProperty]
         bool isSelected;
         public override string ToString()
         {
-            return $"{Amount}x {Name}";
+            return $"{AMOUNT}x {NAME}";
         }
     }
 }
