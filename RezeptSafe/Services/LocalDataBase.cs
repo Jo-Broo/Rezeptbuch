@@ -540,6 +540,8 @@ namespace RezeptSafe.Services
                     // Zutat ist bereits vorhanden
                     tmp.AMOUNT = ingredient.AMOUNT;
                     tmp.UNIT = ingredient.UNIT;
+                    tmp.UNITID = ingredient.UNITID;
+                    
                     internalIngredients.Add(tmp);
                 }
 
@@ -657,11 +659,17 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
 
-                var unit = ingredient.SelectedUnit;
+                var unit = await this.UnitPresentInDatabase(ingredient.SelectedUnit);
 
-                if(unit is null)
+                if(unit is null || unit.ID == 0 || string.IsNullOrEmpty(unit.UNIT))
                 {
-                    throw new Exception("Keine Einheit ausgewählt");
+                    unit = await this.UnitPresentInDatabase(new Unit() { UNIT=ingredient.UNIT });
+
+                    if(unit is null)
+                    {
+                        throw new Exception("Keine Einheit ausgewählt");
+
+                    }
                 }
 
                 string sql = @"INSERT INTO RECIPEINGREDIENT(RECIPEID,INGREDIENTID,AMOUNT,UNITID) VALUES (?,?,?,?)";
@@ -739,7 +747,7 @@ namespace RezeptSafe.Services
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
-            
+
             return result;
         }
         public async Task<int> GetLastIngredientIDAsync()
@@ -781,6 +789,29 @@ namespace RezeptSafe.Services
                 System.Diagnostics.Debug.WriteLine(ex.Message);
                 return new List<Unit>();
             }
+        }
+        public async Task<Unit?> UnitPresentInDatabase(Unit unit)
+        {
+            Unit? result = new Unit();
+            try
+            {
+                var connection = this.GetConnection();
+
+                string sql = @"SELECT * FROM UNIT WHERE LOWER(UNIT) LIKE LOWER(?)";
+
+                result = (await connection.QueryAsync<Unit>(sql, unit.UNIT)).FirstOrDefault();
+
+                if(result == null)
+                {
+                    throw new Exception($"Keine Einheit mit dem Namen [{unit.UNIT}] gefunden");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+
+            return result;
         }
 
         public async Task<int> AddUtensilAsync(Utensil utensil)
@@ -927,5 +958,7 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+
+        
     }
 }

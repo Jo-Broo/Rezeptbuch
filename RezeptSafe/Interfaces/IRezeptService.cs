@@ -29,6 +29,7 @@ namespace RezeptSafe.Interfaces
         Task<Ingredient?> IngredientPresentInDatabase(Ingredient ingredient);
         Task<int> GetLastIngredientIDAsync();
         Task<List<Unit>> GetAllUnitsAsync();
+        Task<Unit?> UnitPresentInDatabase(Unit unit);
  
         // Utensilien
         Task<List<Utensil>> GetAllUtensilsAsync();

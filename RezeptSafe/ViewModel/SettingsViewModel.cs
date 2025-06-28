@@ -23,6 +23,8 @@ namespace RezeptSafe.ViewModel
         {
             this.rezeptService = rezeptService;
             this.UpdateButtonText();
+
+            this.Title = "Einstellungen";
         }
 
         [RelayCommand]

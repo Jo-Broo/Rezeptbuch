@@ -5,7 +5,7 @@
              xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
              x:DataType="viewmodel:SettingsViewModel"
              x:Class="RezeptSafe.View.SettingsPage"
-             Title="Settings">
+             Title="{Binding Title}">
     
     <VerticalStackLayout Padding="20" Spacing="25">
         <!--<Label Text="Designmodus" FontSize="20" />-->
