@@ -21,9 +21,12 @@ namespace RezeptSafe.ViewModel
 
         IRezeptShareService rezeptShareService;
 
-        public RecipeDetailsViewModel(IAlertService alertService, IRezeptShareService rezeptShareService) : base(alertService)
+        IRezeptService rezeptService;
+
+        public RecipeDetailsViewModel(IAlertService alertService, IRezeptShareService rezeptShareService, IRezeptService rezeptService) : base(alertService)
         {
             this.rezeptShareService = rezeptShareService;
+            this.rezeptService = rezeptService;
         }
 
         [RelayCommand]
@@ -34,6 +37,31 @@ namespace RezeptSafe.ViewModel
             popup.SetQRCodeValue(this.rezeptShareService.CompressJsonToBase64(JsonSerializer.Serialize(this.Recipe)));
 
             Shell.Current.ShowPopup(popup);
+        }
+
+        [RelayCommand]
+        async Task OnDeleteRecipeAsync()
+        {
+            if(this.Recipe is not null)
+            {
+                if(await this.alertService.ShowAlertWithChoiceAsync("Warnung","Wollen sie das Rezept wirklich löschen?", "Ja", "Nein"))
+                {
+                    int x = await this.rezeptService.DeleteRecipeAsync(this.Recipe.Id);
+
+                    var result = await this.rezeptService.GetRecipeAsync(this.Recipe.Id);
+
+                    if (result is null && x == 1)
+                    {
+                        await this.alertService.ShowAlertAsync("Info", "Das Rezept wurde erfolgreich gelöscht");
+
+                        await Shell.Current.GoToAsync("..");
+                        return;
+                    }
+                }
+                return;
+            }
+            await this.alertService.ShowAlertAsync("Error", "Das Rezept konnte nicht gelöscht werden");
+            return;
         }
     }
 }

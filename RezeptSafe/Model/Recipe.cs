@@ -22,50 +22,62 @@ namespace RezeptSafe.Model
         public string ZutatenLabel => $"{this.Utensils.Count} Zutat{((this.Utensils.Count > 1) ? "en" : "")}";
         public string ZeitLabel => $"ca. {this.TIME} minute{((this.TIME > 1) ? "n":"")}";
         public string UsernameLabel => $"Erstellt von: {this.USERNAME}";
-        public bool IsValidRecipe(out string error)
+        public bool IsValidRecipe(out Tuple<Step, string> error)
         {
+            error = new Tuple<Step, string>(Step.None, "");
+
             if (string.IsNullOrWhiteSpace(this.TITLE))
             {
-                error = "Bitte gib einen Titel für das Rezept ein.";
-                return false;
-            }
-            else if (string.IsNullOrWhiteSpace(this.DESCRIPTION))
-            {
-                error = "Bitte gib eine Beschreibung für das Rezept ein.";
-                return false;
-            }
-            else if (this.Ingredients.Count == 0)
-            {
-                error = "Füge mindestens eine Zutat hinzu.";
-                return false;
-            }
-            else if (this.Ingredients.Any(x => x.AMOUNT == 0))
-            {
-                error = "Überprüfe die Mengenangaben der Zutaten. Keine darf 0 sein.";
-                return false;
-            }
-            else if (this.Ingredients.Any(x => x.UNITID == 0) || this.Ingredients.Any(x => x.UNIT == string.Empty))
-            {
-                error = "Überprüfe die Mengenangaben bei den Zutaten";
-            }
-            else if (this.Utensils.Count == 0)
-            {
-                error = "Füge mindestens ein benötigtes Utensil hinzu.";
-                return false;
-            }
-            else if (this.Utensils.Any(x => x.AMOUNT == 0))
-            {
-                error = "Überprüfe die Mengenangaben der Utensilien. Keine darf 0 sein.";
-                return false;
-            }
-            else if (this.TIME <= 0)
-            {
-                error = "Gib eine sinnvolle Zubereitungszeit an.";
+                error = new Tuple<Step, string>(Step.Title,"Bitte gib einen Titel für das Rezept ein.");
                 return false;
             }
 
-            error = string.Empty;
+            if (string.IsNullOrWhiteSpace(this.DESCRIPTION))
+            {
+                error = new Tuple<Step, string>(Step.Title,"Bitte gib eine Beschreibung für das Rezept ein.");
+                return false;
+            }
+
+            if (this.Ingredients.Count == 0)
+            {
+                error = new Tuple<Step, string>(Step.Ingredients, "Füge mindestens eine Zutat hinzu.");
+                return false;
+            }
+
+            if (this.Ingredients.Any(x => x.AMOUNT <= 0))
+            {
+                error = new Tuple<Step, string>(Step.Ingredients, "Jede Zutat muss eine Mengenangabe größer als 0 haben.");
+                return false;
+            }
+
+            if (this.Ingredients.Any(x => x.SelectedUnit.ID == 0 || string.IsNullOrWhiteSpace(x.SelectedUnit.UNIT)))
+            {
+                error = new Tuple<Step, string>(Step.Ingredients, "Jede Zutat muss eine gültige Einheit besitzen.");
+                return false;
+            }
+
+            if (this.Utensils.Any(x => x.AMOUNT <= 0))
+            {
+                error = new Tuple<Step, string>(Step.Utensils, "Jedes Utensil muss eine Mengenangabe größer als 0 haben.");
+                return false;
+            }
+
+            if (this.TIME <= 0)
+            {
+                error = new Tuple<Step, string>(Step.Time, "Bitte gib eine sinnvolle Zubereitungszeit in Minuten an.");
+                return false;
+            }
+
             return true;
+        }
+
+        public enum Step
+        {
+            None = 0,
+            Title = 1,
+            Ingredients = 2,
+            Utensils = 3,
+            Time = 4,
         }
     }
 }

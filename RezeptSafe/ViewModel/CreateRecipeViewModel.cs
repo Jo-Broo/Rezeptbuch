@@ -14,6 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static RezeptSafe.Model.Recipe;
 
 namespace RezeptSafe.ViewModel
 {
@@ -49,17 +50,17 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsBackVisible))]
         [NotifyPropertyChangedFor(nameof(IsForwardVisible))]
-        int step;
+        Step step;
 
         // Schritt 1: Titel und Beschreibung einfügen
         // Schritt 2: Zutaten auswählen
         // Schritt 3: Utensilien hinzufügen
         // Schritt 4: Zeitangabe machen und speichern
-        const int maxSteps = 4;
+        const int maxSteps = (int)Step.Time;
 
-        public bool IsBackVisible => (this.Step > 1);
+        public bool IsBackVisible => ((int)this.Step > 1);
 
-        public bool IsForwardVisible => (this.Step < maxSteps);
+        public bool IsForwardVisible => ((int)this.Step < maxSteps);
 
         public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService, IRezeptShareService shareService) : base(alertService) 
         {
@@ -204,7 +205,7 @@ namespace RezeptSafe.ViewModel
 
                     Recipe? newRecipe = JsonSerializer.Deserialize<Recipe>(recipeJSON);
 
-                    string error = string.Empty;
+                    Tuple<Step, string> error = new Tuple<Step, string>(Step.None, "");
 
                     if (newRecipe != null && newRecipe.IsValidRecipe(out error))
                     {
@@ -219,7 +220,7 @@ namespace RezeptSafe.ViewModel
                     }
                     else
                     {
-                        await this.alertService.ShowAlertAsync("Error", error);
+                        await this.alertService.ShowAlertAsync("Error", error.Item2);
                     }
 
                 }
@@ -246,9 +247,11 @@ namespace RezeptSafe.ViewModel
 
             this.Recipe.Utensils = this.AllUtensils.Where(x => x.IsSelected == true).ToList();
 
-            if(!this.Recipe.IsValidRecipe(out string error))
+            if(!this.Recipe.IsValidRecipe(out Tuple<Step,string> error))
             {
-                await this.alertService.ShowAlertAsync("Error", error);
+                await this.alertService.ShowAlertAsync("Error", error.Item2);
+                this.Step = error.Item1;
+                this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
                 return;
             }
 
@@ -258,7 +261,7 @@ namespace RezeptSafe.ViewModel
             }
             else
             {
-                await Shell.Current.GoToAsync("..");
+                await Shell.Current.GoToAsync(nameof(ListRecipesPage),true);
             }
         }
 
@@ -274,7 +277,7 @@ namespace RezeptSafe.ViewModel
             {
                 this.IsBusy = true;
 
-                this.Step = 1;
+                this.Step = Step.Title;
                 this.Title = $"Schritt: 1/{CreateRecipeViewModel.maxSteps}";
 
                 await this.QueryAllIngredients();
@@ -295,14 +298,14 @@ namespace RezeptSafe.ViewModel
         void StepVorwardAsync() 
         {
             this.Step++;
-            this.Title = $"Schritt: {this.Step}/{CreateRecipeViewModel.maxSteps}";
+            this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
         }
         
         [RelayCommand]
         void StepBackAsync() 
         {
             this.Step--;
-            this.Title = $"Schritt: {this.Step}/{CreateRecipeViewModel.maxSteps}";
+            this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
         }
     }
 }

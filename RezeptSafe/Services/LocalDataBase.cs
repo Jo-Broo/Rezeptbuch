@@ -357,8 +357,10 @@ namespace RezeptSafe.Services
                 return new List<Recipe>();
             }
         }
-        public async Task<Recipe> GetRecipeAsync(int id)
+        public async Task<Recipe?> GetRecipeAsync(int id)
         {
+            Recipe? recipe = null;
+            
             try
             {
                 var conn = this.GetConnection();
@@ -366,21 +368,20 @@ namespace RezeptSafe.Services
                 string sql = @"SELECT * FROM RECIPE WHERE ID = ?";
                 var result = await conn.QueryAsync<Recipe>(sql);
 
-                var recipe = result.FirstOrDefault();
+                recipe = result.FirstOrDefault();
 
                 if (recipe == null)
                     throw new Exception($"Keine Rezepte mit der ID=[{id}] gefunden.");
 
                 recipe.Ingredients = await this.GetIngredientsForRecipeAsync(id);
                 recipe.Utensils = await this.GetUtensilsForRecipeAsync(id);
-
-                return recipe;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
-                return new Recipe();
             }
+
+            return recipe;
         }
         public async Task<int> AddRecipeAsync(Recipe recipe)
         {
@@ -479,7 +480,7 @@ namespace RezeptSafe.Services
             try
             {
                 var conn = this.GetConnection();
-                string sql = @"DELETE * FORM RECIPE WHERE ID = ?";
+                string sql = @"DELETE FROM RECIPE WHERE ID = ?";
 
                 var result = await conn.ExecuteAsync(sql, recipeID);
                 if (result == 1)

@@ -11,7 +11,7 @@ namespace RezeptSafe.Interfaces
 
         // Rezepte
         Task<List<Recipe>> GetAllRecipesAsync();
-        Task<Recipe> GetRecipeAsync(int recipeID);
+        Task<Recipe?> GetRecipeAsync(int recipeID);
         Task<int> AddRecipeAsync(Recipe recipe);
         Task<int> UpdateRecipeAsync(Recipe recipe);
         Task<int> DeleteRecipeAsync(int recipeID);
