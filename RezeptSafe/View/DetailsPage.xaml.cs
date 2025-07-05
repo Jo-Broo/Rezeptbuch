@@ -5,6 +5,7 @@ namespace RezeptSafe.View;
 public partial class DetailsPage : ContentPage
 {
     private ToolbarItem _deleteRecipeButton;
+    private ToolbarItem _editRecipeButton;
 
     public DetailsPage(RecipeDetailsViewModel viewModel)
 	{
@@ -16,6 +17,12 @@ public partial class DetailsPage : ContentPage
             IconImageSource = "trash.svg",
             Command = viewModel.DeleteRecipeCommand
         };
+
+        this._editRecipeButton = new ToolbarItem
+        {
+            IconImageSource = "pen.svg",
+            Command = viewModel.NavigateToEditRecipeCommand
+        };
     }
 
     protected override void OnAppearing()
@@ -26,12 +33,17 @@ public partial class DetailsPage : ContentPage
         {
             this.ToolbarItems.Add(this._deleteRecipeButton);
         }
+
+        if (!this.ToolbarItems.Contains(this._editRecipeButton))
+        {
+            this.ToolbarItems.Add(this._editRecipeButton);
+        }
     }
 
     protected override void OnDisappearing() 
     { 
         base.OnDisappearing(); 
 
-        this.ToolbarItems.Remove(this._deleteRecipeButton);
+        this.ToolbarItems.Clear();
     }
 }

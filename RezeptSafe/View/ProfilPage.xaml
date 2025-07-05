@@ -6,9 +6,9 @@
              x:DataType="viewmodel:ProfilViewModel"
              x:Class="RezeptSafe.View.ProfilPage"
              Title="{Binding Title}">
-    <VerticalStackLayout>
-        <Label Text="Username:"/>
-        <Entry Placeholder="Benutzername" Margin="5" Text="{Binding Username}" TextChanged="Entry_TextChanged"/>
+    <VerticalStackLayout Padding="10">
+        <Label Text="Username:" Style="{StaticResource ProfilTitleLabelStyle}"/>
+        <Entry Placeholder="Benutzername" Text="{Binding Username}" TextChanged="Entry_TextChanged"/>
         <Button Text="Änderung speichern" IsVisible="{Binding NameHasChanged}" CommandParameter="{Binding Username}" Command="{Binding SetUsernameCommand}"/>
     </VerticalStackLayout>
 </ContentPage>

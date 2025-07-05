@@ -345,8 +345,8 @@ namespace RezeptSafe.Services
 
                 foreach (Recipe recipe in result)
                 {
-                    recipe.Ingredients = await this.GetIngredientsForRecipeAsync(recipe.Id);
-                    recipe.Utensils = await this.GetUtensilsForRecipeAsync(recipe.Id);
+                    recipe.Ingredients = await this.GetIngredientsForRecipeAsync(recipe.ID);
+                    recipe.Utensils = await this.GetUtensilsForRecipeAsync(recipe.ID);
                 }
 
                 return result;
@@ -395,13 +395,13 @@ namespace RezeptSafe.Services
 
                 if(result == 1)
                 {
-                    recipe.Id = await this.GetLastRecipeIDAsync();
+                    recipe.ID = await this.GetLastRecipeIDAsync();
 
                     var tasks = new List<Task>();
 
                     foreach (var ingredient in recipe.Ingredients)
                     {
-                        if(await this.AddIngredientToRecipeAsync(recipe.Id, ingredient) == -1)
+                        if(await this.AddIngredientToRecipeAsync(recipe.ID, ingredient) == -1)
                         {
                             throw new Exception("Beim einfügen in die RecipeIngredient Tabelle ist ein Fehler aufgetreten");
                         }
@@ -409,7 +409,7 @@ namespace RezeptSafe.Services
 
                     foreach (var utensil in recipe.Utensils)
                     {
-                        if(await this.AddUtensilToRecipeAsync(recipe.Id, utensil) == -1)
+                        if(await this.AddUtensilToRecipeAsync(recipe.ID, utensil) == -1)
                         {
                             throw new Exception("Beim einfügen in die RecipeUtensil Tabelle ist ein Fehler aufgetreten");
                         }
@@ -439,27 +439,27 @@ namespace RezeptSafe.Services
                                 IMAGEPATH = ?)
                                WHERE
                                 ID = ?";
-                var result = await conn.ExecuteAsync(sql, recipe.TITLE, recipe.DESCRIPTION, recipe.TIME, recipe.USERNAME, recipe.IMAGEPATH, recipe.Id);
+                var result = await conn.ExecuteAsync(sql, recipe.TITLE, recipe.DESCRIPTION, recipe.TIME, recipe.USERNAME, recipe.IMAGEPATH, recipe.ID);
 
                 if (result == 1)
                 {
                     // Zutaten und Utensilien werden einfach gelöscht und neu angelegt
                     // wie viele können das schon sein
 
-                    await this.RemoveAllIngredientsFromRecipeAsync(recipe.Id);
+                    await this.RemoveAllIngredientsFromRecipeAsync(recipe.ID);
 
-                    await this.RemoveAllUtensilsFromRecipeAsync(recipe.Id);
+                    await this.RemoveAllUtensilsFromRecipeAsync(recipe.ID);
 
                     var tasks = new List<Task>();
 
                     foreach (var ingredient in recipe.Ingredients)
                     {
-                        tasks.Add(this.AddIngredientToRecipeAsync(recipe.Id, ingredient));
+                        tasks.Add(this.AddIngredientToRecipeAsync(recipe.ID, ingredient));
                     }
 
                     foreach (var utensil in recipe.Utensils)
                     {
-                        tasks.Add(this.AddUtensilToRecipeAsync(recipe.Id, utensil));
+                        tasks.Add(this.AddUtensilToRecipeAsync(recipe.ID, utensil));
                     }
 
                     await Task.WhenAll(tasks);

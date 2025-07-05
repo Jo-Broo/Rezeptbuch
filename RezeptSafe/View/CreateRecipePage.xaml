@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
@@ -34,17 +35,18 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Label Text="Zutaten:" Grid.Row="0" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
+                
+                <Label Text="Zutaten:" Grid.Row="0" Grid.Column="0" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
                 <SearchBar Placeholder="Suchfeld" Grid.Row="1" Text="{Binding IngredientSearchText}" Style="{StaticResource RecipeCreateTitleLabelStyle}" />
                 <CollectionView Grid.Row="2" ItemsSource="{Binding FilteredIngredients}" 
                     SelectionMode="Multiple"
                     SelectionChanged="OnIngredientsSelectionChanged">
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="model:Ingredient">
-                    
-                    <Grid ColumnDefinitions="auto,*,100">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Ingredient">
+                            <Grid ColumnDefinitions="auto,*,100">
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroup Name="CommonStates">
                                         <VisualState Name="Normal"/>
@@ -56,16 +58,17 @@
                                     </VisualStateGroup>
                                 </VisualStateManager.VisualStateGroups>
                                 <Label Text="{Binding NAME}" Grid.Column="0" Style="{StaticResource RecipeCreateInfoLabelStyle}" FontSize="36"/>
-                        <HorizontalStackLayout Grid.Column="2" IsVisible="{Binding IsSelected}">
-                            <Entry Keyboard="Numeric" WidthRequest="50" Text="{Binding AMOUNT}"/>
-                            <Picker Title="Einheit" WidthRequest="50" ItemsSource="{Binding Units}" ItemDisplayBinding="{Binding UNIT}" SelectedItem="{Binding SelectedUnit}"/>
-                        </HorizontalStackLayout>
-                    </Grid>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                                <HorizontalStackLayout Grid.Column="2" IsVisible="{Binding IsSelected}">
+                                    <Entry Keyboard="Numeric" WidthRequest="50" Text="{Binding AMOUNT}"/>
+                                    <Picker Title="Einheit" WidthRequest="50" ItemsSource="{Binding Units}" ItemDisplayBinding="{Binding UNIT}" SelectedItem="{Binding SelectedUnit}"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Grid>
         </Frame>
+        <Button Text="Neue Zutat hinzuf&#252;gen" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=2}" Command="{Binding CreateNewIngredientCommand}"/>
 
         <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=3}">
             <Grid>
@@ -102,6 +105,7 @@
                 </CollectionView>
             </Grid>
         </Frame>
+        <Button Text="Neues Utensil hinzuf&#252;gen" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=3}" Command="{Binding CreateNewUtensilCommand}"/>
 
         <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=4}">
             <Grid RowDefinitions="auto,auto,auto,auto,auto">

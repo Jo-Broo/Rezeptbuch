@@ -5,15 +5,19 @@
              xmlns:model="clr-namespace:RezeptSafe.Model"
              x:Class="RezeptSafe.View.DetailsPage"
              x:DataType="viewmodel:RecipeDetailsViewModel"
-             Title="{Binding Recipe.TITLE}">
+             Title="{Binding Title}">
 
     <Grid RowDefinitions="*,auto">
         <ScrollView Grid.Row="0">
-            <VerticalStackLayout>
-                <Border Margin="5" StrokeShape="RoundRectangle 40,0,0,40" StrokeThickness="2">
+            <VerticalStackLayout Margin="10">
+                <HorizontalStackLayout HorizontalOptions="Center">
+                    <Label Text="{Binding Recipe.TITLE}" Style="{StaticResource RecipeDetailTitleLabelStyle}"/>
+                </HorizontalStackLayout>
+                <Border BackgroundColor="White" HeightRequest="2"/>
+                <Border Margin="5" StrokeShape="RoundRectangle 40,0,0,40" StrokeThickness="2" IsVisible="{Binding Recipe.IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}">
                     <Image Source="dotnet_bot.png" HeightRequest="160" Aspect="AspectFill" Margin="8"/>
                 </Border>
-                <Label Text="Benötigte Utensilien:" Margin="5"/>
+                <Label Text="Benötigte Utensilien:" Margin="5" IsVisible="{Binding Recipe.Utensils.Count, Converter={StaticResource NumberToBoolConverter}}"/>
                 <CollectionView ItemsSource="{Binding Recipe.Utensils}">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Utensil">
@@ -21,7 +25,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Border BackgroundColor="White" HeightRequest="2"/>
+                <Border BackgroundColor="White" HeightRequest="2" IsVisible="{Binding Recipe.Utensils.Count, Converter={StaticResource NumberToBoolConverter}}"/>
                 <Label Text="Benötigte Zutaten:" Margin="5"/>
                 <CollectionView ItemsSource="{Binding Recipe.Ingredients}">
                     <CollectionView.ItemTemplate>
@@ -35,7 +39,7 @@
                 <Label Text="{Binding Recipe.DESCRIPTION}" Margin="5"/>
             </VerticalStackLayout>
         </ScrollView>
-        <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQRClickedCommand}"/>
+        <Button Text="QR-Code anzeigen" Grid.Row="1" Margin="5" Command="{Binding ShowQRClickedAsyncCommand}"/>
     </Grid>
     
     

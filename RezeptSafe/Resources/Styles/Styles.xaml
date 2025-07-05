@@ -502,5 +502,13 @@
         <Setter Property="Spacing" Value="11" />
         <Setter Property="Grid.ColumnSpan" Value="2" />
     </Style>
+    
+    <!-- Profil -->
+
+    <Style x:Key="ProfilTitleLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#222222, Dark=White}" />
+    </Style>
 
 </ResourceDictionary>

@@ -25,6 +25,7 @@ namespace RezeptSafe.ViewModel
             this.userService = userService;
             this.Username = this.userService.GetUsername();
             this.NameHasChanged = false;
+            this.Title = "Profil";
         }
 
         [RelayCommand]

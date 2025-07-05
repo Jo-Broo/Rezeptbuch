@@ -67,8 +67,8 @@ namespace RezeptSafe.ViewModel
 
                 foreach (var recipe in recipes) 
                 {
-                    recipe.Ingredients = await this.rezeptService.GetIngredientsForRecipeAsync(recipe.Id);
-                    recipe.Utensils = await this.rezeptService.GetUtensilsForRecipeAsync(recipe.Id);
+                    recipe.Ingredients = await this.rezeptService.GetIngredientsForRecipeAsync(recipe.ID);
+                    recipe.Utensils = await this.rezeptService.GetUtensilsForRecipeAsync(recipe.ID);
                     this.Recipes.Add(recipe);
                 }
             }

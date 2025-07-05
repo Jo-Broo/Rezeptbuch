@@ -28,5 +28,4 @@ namespace RezeptSafe.Model
             return $"{this.AMOUNT}{this.UNIT} {this.NAME}";
         }
     }
-
 }

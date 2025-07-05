@@ -4,6 +4,7 @@ using RezeptSafe.ViewModel;
 
 namespace RezeptSafe.View;
 
+
 public partial class CreateRecipePage : ContentPage
 {
     private ToolbarItem _qrScannerButton;
@@ -24,16 +25,14 @@ public partial class CreateRecipePage : ContentPage
     {
         base.OnAppearing();
 
-        _ = DelayedInitializeAsync();
+        var vm = (BindingContext as CreateRecipeViewModel);
 
-        if (!this.ToolbarItems.Contains(this._qrScannerButton))
+        vm?.InitializeCommand.Execute(null);
+
+        if(vm?.Recipe.ID == 0)
+        {
             this.ToolbarItems.Add(this._qrScannerButton);
-    }
-
-    private async Task DelayedInitializeAsync()
-    {
-        //await Task.Delay(500); // lässt UI vorher rendern
-        (BindingContext as CreateRecipeViewModel)?.InitializeCommand.Execute(null);
+        }
     }
 
     protected override void OnDisappearing()

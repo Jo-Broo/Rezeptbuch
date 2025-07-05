@@ -9,7 +9,7 @@ namespace RezeptSafe.Model
 {
     public class Recipe
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string TITLE { get; set; } = string.Empty;
         public string DESCRIPTION { get; set; } = string.Empty;
         public DateTime CREATEDAT { get; set; } = DateTime.Now;
@@ -18,8 +18,8 @@ namespace RezeptSafe.Model
         public string IMAGEPATH { get; set; } = string.Empty;
         public List<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
         public List<Utensil> Utensils { get; set; } = new List<Utensil>();
-        public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count > 1) ? "ien" : "")}";
-        public string ZutatenLabel => $"{this.Utensils.Count} Zutat{((this.Utensils.Count > 1) ? "en" : "")}";
+        public string UtensilienLabel => $"{this.Utensils.Count} Utensil{((this.Utensils.Count != 1) ? "ien" : "")}";
+        public string ZutatenLabel => $"{this.Ingredients.Count} Zutat{((this.Ingredients.Count != 1) ? "en" : "")}";
         public string ZeitLabel => $"ca. {this.TIME} minute{((this.TIME > 1) ? "n":"")}";
         public string UsernameLabel => $"Erstellt von: {this.USERNAME}";
         public bool IsValidRecipe(out Tuple<Step, string> error)

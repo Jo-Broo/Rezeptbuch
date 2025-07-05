@@ -20,5 +20,10 @@ namespace RezeptSafe.Services
         {
             return Shell.Current.DisplayAlert(title, message, "OK");
         }
+
+        public Task<string> ShowPromptAsync(string title, string message)
+        {
+            return Shell.Current.DisplayPromptAsync(title, message);
+        }
     }
 }

@@ -23,6 +23,7 @@ namespace RezeptSafe.ViewModel
         public BaseViewModel(IAlertService alertService)
         {
             this.alertService = alertService;
+            this.Title = "Nicht festegelgt";
         }
 
         public bool IsNotBusy => !this.IsBusy;

@@ -11,6 +11,8 @@
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
                 <ResourceDictionary>
                     <converter:StepToBoolConverter x:Key="StepToBoolConverter"/>
+                    <converter:FilePathToBoolConverter x:Key="FilePathToBoolConverter"/>
+                    <converter:NumberToBoolConverter x:Key="NumberToBoolConverter"/>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

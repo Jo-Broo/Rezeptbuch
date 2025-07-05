@@ -41,7 +41,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Image Style="{StaticResource RecipeDetailImageStyle}" Source="dotnet_bot.png"/>
+                                <Image Style="{StaticResource RecipeDetailImageStyle}" Source="dotnet_bot.png" IsVisible="{Binding IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}"/>
                                 <VerticalStackLayout Grid.Column="1" Style="{StaticResource RecipeDetailVerticalStackStyle}">
                                     <Label Text="{Binding TITLE}" Style="{StaticResource RecipeDetailTitleLabelStyle}"/>
                                     <Label Text="{Binding UtensilienLabel}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>

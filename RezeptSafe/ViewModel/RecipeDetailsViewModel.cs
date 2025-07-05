@@ -27,10 +27,11 @@ namespace RezeptSafe.ViewModel
         {
             this.rezeptShareService = rezeptShareService;
             this.rezeptService = rezeptService;
+            this.Title = "Detailansicht";
         }
 
         [RelayCommand]
-        async Task OnShowQRClickedAsync()
+        void OnShowQRClickedAsync()
         {
             var popup = new QRCodePopup();
             
@@ -46,9 +47,9 @@ namespace RezeptSafe.ViewModel
             {
                 if(await this.alertService.ShowAlertWithChoiceAsync("Warnung","Wollen sie das Rezept wirklich löschen?", "Ja", "Nein"))
                 {
-                    int x = await this.rezeptService.DeleteRecipeAsync(this.Recipe.Id);
+                    int x = await this.rezeptService.DeleteRecipeAsync(this.Recipe.ID);
 
-                    var result = await this.rezeptService.GetRecipeAsync(this.Recipe.Id);
+                    var result = await this.rezeptService.GetRecipeAsync(this.Recipe.ID);
 
                     if (result is null && x == 1)
                     {
@@ -62,6 +63,19 @@ namespace RezeptSafe.ViewModel
             }
             await this.alertService.ShowAlertAsync("Error", "Das Rezept konnte nicht gelöscht werden");
             return;
+        }
+
+        [RelayCommand]
+        async Task NavigateToEditRecipe()
+        {
+            if (this.Recipe is not null)
+            {
+                await Shell.Current.GoToAsync($"{nameof(CreateRecipePage)}", true,
+                new Dictionary<string, object>
+                {
+                    {"Recipe", this.Recipe }
+                });
+            }
         }
     }
 }

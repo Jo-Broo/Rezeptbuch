@@ -18,6 +18,7 @@ using static RezeptSafe.Model.Recipe;
 
 namespace RezeptSafe.ViewModel
 {
+    [QueryProperty("Recipe", "Recipe")]
     public partial class CreateRecipeViewModel : BaseViewModel
     {
         IRezeptService rezeptService;
@@ -283,6 +284,38 @@ namespace RezeptSafe.ViewModel
                 await this.QueryAllIngredients();
                 await this.QueryAllUtensils();
                 await this.QueryAllUnits();
+
+                if(this.Recipe.ID > 0)
+                {
+                    // Zutaten auswählen
+                    foreach (var ingredient in this.Recipe.Ingredients)
+                    {
+                        var tempIngredient = this.AllIngredients.Where(x => x.NAME == ingredient.NAME).FirstOrDefault();
+                        if(tempIngredient is not null)
+                        {
+                            tempIngredient.IsSelected = true;
+
+                            var tempUnit = this.AllUnits.Where(x => x.UNIT == ingredient.UNIT).FirstOrDefault();
+                            if (tempUnit is not null)
+                            {
+                                tempIngredient.SelectedUnit = tempUnit;
+                            }
+                        }
+                    }
+
+                    // Utensilien auswählen
+                    foreach (var utensil in this.Recipe.Utensils)
+                    {
+                        var tempUtensil = this.AllUtensils.Where(x => x.NAME == utensil.NAME).FirstOrDefault();
+                        if(tempUtensil is not null)
+                        {
+                            tempUtensil.IsSelected = true;
+                        }
+                    }
+
+                    this.FilterIngredients("");
+                    this.FilterUtensils("");
+                }
             }
             catch (Exception ex)
             {
@@ -306,6 +339,54 @@ namespace RezeptSafe.ViewModel
         {
             this.Step--;
             this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
+        }
+
+        [RelayCommand]
+        async Task CreateNewIngredientAsync()
+        {
+            Ingredient newIngredient = new Ingredient();
+            newIngredient.NAME = await this.alertService.ShowPromptAsync("Neue Zutat erstellen", "Name der Zutat");
+
+            if (!string.IsNullOrWhiteSpace(newIngredient.NAME))
+            {
+                if (await this.rezeptService.AddIngredientAsync(newIngredient) == 1)
+                {
+                    await this.alertService.ShowAlertAsync("Info", $"Die Zutat {newIngredient.NAME} wurde erfolgreich erstellt");
+                    await this.QueryAllIngredients();
+                    return;
+                }
+                else
+                {
+                    await this.alertService.ShowAlertAsync("Fehler", $"Die Zutat {newIngredient.NAME} wurde nicht erfolgreich erstellt");
+                    return;
+                }
+            }
+
+            await this.alertService.ShowAlertAsync("Fehler", "Der Zutatenname darf nicht leer sein");
+        }
+
+        [RelayCommand]
+        async Task CreateNewUtensilAsync()
+        {
+            Utensil newUtensil = new Utensil();
+            newUtensil.NAME = await this.alertService.ShowPromptAsync("Neues Utensil erstellen", "Name der Utensilie");
+
+            if (!string.IsNullOrWhiteSpace(newUtensil.NAME))
+            {
+                if (await this.rezeptService.AddUtensilAsync(newUtensil) == 1)
+                {
+                    await this.alertService.ShowAlertAsync("Info", $"Die Utensilie {newUtensil.NAME} wurde erfolgreich erstellt");
+                    await this.QueryAllUtensils();
+                    return;
+                }
+                else
+                {
+                    await this.alertService.ShowAlertAsync("Fehler", $"Die Utensilie {newUtensil.NAME} wurde nicht erfolgreich erstellt");
+                    return;
+                }
+            }
+
+            await this.alertService.ShowAlertAsync("Fehler", "Der Utensilienname darf nicht leer sein");
         }
     }
 }
