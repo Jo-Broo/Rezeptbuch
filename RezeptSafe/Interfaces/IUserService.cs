@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace RezeptSafe.Interfaces
 {
-    public interface IThemeService
+    public interface IUserService
     {
-        void ToggleTheme();
+        public string GetUsername();
+        public void SetUsername(string username);
     }
 }

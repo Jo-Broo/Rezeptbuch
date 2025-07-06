@@ -35,7 +35,7 @@ namespace RezeptSafe
             builder.Services.AddSingleton<IUserService, UserService>();
             builder.Services.AddSingleton<IAlertService, AlertService>();
             builder.Services.AddSingleton<IRezeptShareService, RezeptShareService>();
-            builder.Services.AddSingleton<IThemeService, ThemeService>();
+            builder.Services.AddSingleton<IPreferenceService, PreferenceService>();
             // ViewModels
             builder.Services.AddSingleton<RecipesViewModel>();
             builder.Services.AddTransient<RecipeDetailsViewModel>();

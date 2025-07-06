@@ -7,15 +7,12 @@
              x:Class="RezeptSafe.View.SettingsPage"
              Title="{Binding Title}">
     
-    <VerticalStackLayout Padding="20" Spacing="25">
-        <!--<Label Text="Designmodus" FontSize="20" />-->
-        <!--<Button Command="{Binding ToggleThemeClickedCommand}"
-                Text="{Binding ButtonText}" />-->
-        <!--<Label Text="Datenbank" FontSize="20"/>
-        <Label x:Name="RecipeCount"/>
-        <Label x:Name="IngredientCount"/>
-        <Label x:Name="UtensilCount"/>-->
-        <HorizontalStackLayout>
+    <VerticalStackLayout Padding="10">
+        <Button Text="Zutaten verwalten" Command="{Binding NavigateToIngredientListCommand}"/>
+        <Button Text="Utensilien verwalten" Command="{Binding NavigateToUtensilListCommand}"/>
+        <Button Text="Einheiten verwalten" Command="{Binding NavigateToUnitListCommand}"/>
+        <Border HeightRequest="2"/>
+        <HorizontalStackLayout Spacing="20">
             <CheckBox IsChecked="{Binding ShowAdvancedOptions}" 
               VerticalOptions="Center" />
             <Label Text="Erweiterte Datenbankoptionen anzeigen"

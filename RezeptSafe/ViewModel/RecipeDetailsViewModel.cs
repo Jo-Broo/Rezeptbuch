@@ -45,7 +45,7 @@ namespace RezeptSafe.ViewModel
         {
             if(this.Recipe is not null)
             {
-                if(await this.alertService.ShowAlertWithChoiceAsync("Warnung","Wollen sie das Rezept wirklich löschen?", "Ja", "Nein"))
+                if(await this._alertService.ShowAlertWithChoiceAsync("Warnung","Wollen sie das Rezept wirklich löschen?", "Ja", "Nein"))
                 {
                     int x = await this.rezeptService.DeleteRecipeAsync(this.Recipe.ID);
 
@@ -53,7 +53,7 @@ namespace RezeptSafe.ViewModel
 
                     if (result is null && x == 1)
                     {
-                        await this.alertService.ShowAlertAsync("Info", "Das Rezept wurde erfolgreich gelöscht");
+                        await this._alertService.ShowAlertAsync("Info", "Das Rezept wurde erfolgreich gelöscht");
 
                         await Shell.Current.GoToAsync("..");
                         return;
@@ -61,7 +61,7 @@ namespace RezeptSafe.ViewModel
                 }
                 return;
             }
-            await this.alertService.ShowAlertAsync("Error", "Das Rezept konnte nicht gelöscht werden");
+            await this._alertService.ShowAlertAsync("Error", "Das Rezept konnte nicht gelöscht werden");
             return;
         }
 

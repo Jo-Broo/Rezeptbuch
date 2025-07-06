@@ -1,4 +1,5 @@
-﻿using RezeptSafe.ViewModel;
+﻿using RezeptSafe.Interfaces;
+using RezeptSafe.ViewModel;
 
 namespace RezeptSafe.View;
 
@@ -6,11 +7,14 @@ public partial class LandingPage : ContentPage
 {
     private ToolbarItem _themeButton;
 
-    public LandingPage(LandingPageViewModel vm)
+    IPreferenceService _preferenceService;
+
+    public LandingPage(LandingPageViewModel vm, IPreferenceService preferenceService)
 	{
 		InitializeComponent();
 
 		this.BindingContext = vm;
+        this._preferenceService = preferenceService;
 
         this._themeButton = new ToolbarItem
         {
@@ -43,7 +47,7 @@ public partial class LandingPage : ContentPage
             ? AppTheme.Light
             : AppTheme.Dark;
 
-            Preferences.Set("AppTheme", App.Current.UserAppTheme.ToString());
+            this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.AppTheme, App.Current.UserAppTheme.ToString());
 
             this._themeButton.IconImageSource = (App.Current.UserAppTheme == AppTheme.Dark) ? "sun.svg" : "moon.svg";
         }

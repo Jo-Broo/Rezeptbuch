@@ -12,8 +12,10 @@ namespace RezeptSafe.Converter
     {
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
-            if (value is Step currentStep && parameter is string stepString && int.TryParse(stepString, out int targetStep))
+            if(value is Step currentStep && parameter is string stepString && int.TryParse(stepString, out int targetStep))
+            {
                 return (int)currentStep == targetStep;
+            }
 
             return false;
         }

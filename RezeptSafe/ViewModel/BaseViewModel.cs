@@ -18,11 +18,11 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         string title;
 
-        internal IAlertService alertService;
+        internal IAlertService _alertService;
 
         public BaseViewModel(IAlertService alertService)
         {
-            this.alertService = alertService;
+            this._alertService = alertService;
             this.Title = "Nicht festegelgt";
         }
 

@@ -1,4 +1,5 @@
-﻿using RezeptSafe.Model;
+﻿using RezeptSafe.Interfaces;
+using RezeptSafe.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace RezeptSafe.Services
 {
-    public interface IUserService
-    {
-        public string GetUsername();
-        public void SetUsername(string username);
-    }
+    
 
     public class UserService : IUserService
     {
         User current = new User();
 
-        public UserService()
+        IPreferenceService _preferenceService;
+
+        public UserService(IPreferenceService preferenceService)
         {
-            string preference = Preferences.Get("Username", string.Empty);
+            this._preferenceService = preferenceService;
+
+            string preference = this._preferenceService.GetPreference(Enum.RezeptbuchPreferences.UserName);
 
             if (preference == string.Empty)
             {
@@ -39,7 +40,7 @@ namespace RezeptSafe.Services
         public void SetUsername(string username)
         {
             this.current.Username = username;
-            Preferences.Set("Username", username);
+            this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.UserName,username);
         }
     }
 }

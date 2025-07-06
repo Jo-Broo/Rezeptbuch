@@ -6,7 +6,7 @@ namespace RezeptSafe.Interfaces
     public interface IRezeptService
     {
         SQLiteAsyncConnection GetConnection(string databaseFile = "");
-        Task<int> InitializeDataBase();
+        Task<int> InitializeDataBase(bool prePopulate);
         Task CloseConnection();
 
         // Rezepte

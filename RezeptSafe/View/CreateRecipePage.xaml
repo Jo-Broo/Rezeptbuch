@@ -29,6 +29,8 @@
                 <Editor Placeholder="Beschreibung" Text="{Binding Recipe.DESCRIPTION}" Style="{StaticResource RecipeCreateEditor}"/>
             </VerticalStackLayout>
         </Frame>
+        <Button Text="Bild auswählen (optional)" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding IsMediaButtonVisible}" Command="{Binding ChooseRecipeImageCommand}"/>
+        <Button Text="Bild entfernen" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding IsImageDeleteVisible}" Command="{Binding RemoveRecipeImageCommand}"/>
 
         <Frame Style="{StaticResource RecipeCreateFrameStyle}" Grid.Row="1" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=2}">
             <Grid>
@@ -113,60 +115,10 @@
                 <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.TIME}" Grid.Row="1" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
                 <Label Text="Ersteller:" Grid.Row="2" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
                 <Label Text="{Binding Recipe.USERNAME}" Grid.Row="3" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
-                <Button Text="Rezept speichern" Command="{Binding SaveClickedCommand}" Grid.Row="4"/>
+                
             </Grid>
         </Frame>
-
-
-        <VerticalStackLayout Style="{StaticResource RecipeCreateVerticalStackStyle}" Grid.Row="1">
-            
-
-            
-
-            <!--<Frame Style="{StaticResource RecipeCreateFrameStyle}">
-        <VerticalStackLayout>
-            <Grid ColumnDefinitions="auto,*" ColumnSpacing="10">
-                <Label Text="Utensilien" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-                <SearchBar Placeholder="Suchfeld" Text="{Binding UtensilSearchText}" Grid.Column="1" Style="{StaticResource RecipeCreateTitleLabelStyle}"/>
-            </Grid>
-            <CollectionView ItemsSource="{Binding FilteredUtensils}" 
-                    SelectionMode="Multiple"
-                    HeightRequest="300"
-                    SelectionChanged="OnUtensilsSelectionChanged">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Utensil">
-                        <Grid ColumnDefinitions="auto,*,100">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup Name="CommonStates">
-                                    <VisualState Name="Normal"/>
-                                    <VisualState Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="BackgroundColor" Value="LightBlue" />
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                            <Label Text="{Binding Name}" Style="{StaticResource RecipeCreateInfoLabelStyle}"/>
-                            <Entry Keyboard="Numeric" Grid.Column="2" FontSize="20" Text="{Binding Amount}" IsVisible="{Binding IsSelected}"/>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </VerticalStackLayout>
-    </Frame>-->
-
-            <!--<Frame Style="{StaticResource RecipeCreateFrameStyle}">
-        <VerticalStackLayout Spacing="10">
-            <Label Text="Zeitangabe:" FontSize="20" Grid.Column="0"/>
-            <Entry Keyboard="Numeric" Placeholder="Zeitangabe in min" Text="{Binding Recipe.Time}"/>
-            <Label Text="Ersteller:" FontSize="20" Grid.Column="0"/>
-            <Label Text="{Binding Recipe.Username}" FontSize="20" Grid.Column="1" TextColor="White"/>
-            <Button Text="Rezept speichern" FontSize="20" Command="{Binding SaveClickedCommand}"/>
-        </VerticalStackLayout>
-    </Frame>-->
-
-        </VerticalStackLayout>
-        
+        <Button Text="{Binding ButtonText}" Command="{Binding SaveClickedCommand}" Grid.Row="2" Grid.ColumnSpan="2" IsVisible="{Binding Step, Converter={StaticResource StepToBoolConverter}, ConverterParameter=4}"/>
 
         <ActivityIndicator IsVisible="{Binding IsBusy}"
                    IsRunning="{Binding IsBusy}"

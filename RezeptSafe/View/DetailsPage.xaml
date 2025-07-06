@@ -13,9 +13,9 @@
                 <HorizontalStackLayout HorizontalOptions="Center">
                     <Label Text="{Binding Recipe.TITLE}" Style="{StaticResource RecipeDetailTitleLabelStyle}"/>
                 </HorizontalStackLayout>
-                <Border BackgroundColor="White" HeightRequest="2"/>
-                <Border Margin="5" StrokeShape="RoundRectangle 40,0,0,40" StrokeThickness="2" IsVisible="{Binding Recipe.IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}">
-                    <Image Source="dotnet_bot.png" HeightRequest="160" Aspect="AspectFill" Margin="8"/>
+                <Border HeightRequest="2"/>
+                <Border Margin="5" StrokeThickness="2" IsVisible="{Binding Recipe.IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}">
+                    <Image Source="{Binding Recipe.IMAGEPATH}" Aspect="AspectFit" Margin="8" HorizontalOptions="Fill" VerticalOptions="Fill"/>
                 </Border>
                 <Label Text="Benötigte Utensilien:" Margin="5" IsVisible="{Binding Recipe.Utensils.Count, Converter={StaticResource NumberToBoolConverter}}"/>
                 <CollectionView ItemsSource="{Binding Recipe.Utensils}">
@@ -25,7 +25,7 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
-                <Border BackgroundColor="White" HeightRequest="2" IsVisible="{Binding Recipe.Utensils.Count, Converter={StaticResource NumberToBoolConverter}}"/>
+                <Border HeightRequest="2" IsVisible="{Binding Recipe.Utensils.Count, Converter={StaticResource NumberToBoolConverter}}"/>
                 <Label Text="Benötigte Zutaten:" Margin="5"/>
                 <CollectionView ItemsSource="{Binding Recipe.Ingredients}">
                     <CollectionView.ItemTemplate>
@@ -35,7 +35,7 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
                 <Label Text="{Binding Recipe.ZeitLabel}" Margin="5"/>
-                <Border BackgroundColor="White" HeightRequest="2"/>
+                <Border HeightRequest="2"/>
                 <Label Text="{Binding Recipe.DESCRIPTION}" Margin="5"/>
             </VerticalStackLayout>
         </ScrollView>

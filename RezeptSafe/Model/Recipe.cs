@@ -22,6 +22,11 @@ namespace RezeptSafe.Model
         public string ZutatenLabel => $"{this.Ingredients.Count} Zutat{((this.Ingredients.Count != 1) ? "en" : "")}";
         public string ZeitLabel => $"ca. {this.TIME} minute{((this.TIME > 1) ? "n":"")}";
         public string UsernameLabel => $"Erstellt von: {this.USERNAME}";
+        public bool DeleteImageFlag { get; set; } = false;
+        public bool AttachImageFlag { get; set; } = false;
+        public string ImageSourcePath = string.Empty;
+
+        
         public bool IsValidRecipe(out Tuple<Step, string> error)
         {
             error = new Tuple<Step, string>(Step.None, "");

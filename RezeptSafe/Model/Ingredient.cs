@@ -25,7 +25,7 @@ namespace RezeptSafe.Model
         ObservableCollection<Unit> units;
         public override string ToString()
         {
-            return $"{this.AMOUNT}{this.UNIT} {this.NAME}";
+            return $"{this.AMOUNT} {this.UNIT} {this.NAME}";
         }
     }
 }

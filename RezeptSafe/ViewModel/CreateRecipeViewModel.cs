@@ -21,9 +21,10 @@ namespace RezeptSafe.ViewModel
     [QueryProperty("Recipe", "Recipe")]
     public partial class CreateRecipeViewModel : BaseViewModel
     {
-        IRezeptService rezeptService;
-        IUserService userService;
-        IRezeptShareService shareService;
+        IRezeptService _rezeptService;
+        IUserService _userService;
+        IRezeptShareService _shareService;
+        IPreferenceService _preferenceService;
 
         [ObservableProperty]
         bool isScanning = false;
@@ -51,6 +52,7 @@ namespace RezeptSafe.ViewModel
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(IsBackVisible))]
         [NotifyPropertyChangedFor(nameof(IsForwardVisible))]
+        [NotifyPropertyChangedFor(nameof(IsMediaButtonVisible))]
         Step step;
 
         // Schritt 1: Titel und Beschreibung einfügen
@@ -63,13 +65,23 @@ namespace RezeptSafe.ViewModel
 
         public bool IsForwardVisible => ((int)this.Step < maxSteps);
 
-        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService, IRezeptShareService shareService) : base(alertService) 
-        {
-            this.rezeptService = rezeptservice;
-            this.userService = userService;
-            this.shareService = shareService;
+        [ObservableProperty]
+        string buttonText = string.Empty;
 
-            this.Recipe.USERNAME = this.userService.GetUsername();
+        bool _mediaPreference = false;
+
+        public bool IsMediaButtonVisible => this.Step == Step.Title && this._mediaPreference && (this.Recipe.IMAGEPATH == "" && !this.Recipe.DeleteImageFlag);
+
+        public bool IsImageDeleteVisible => this.Recipe.IMAGEPATH != "" && this.Recipe.DeleteImageFlag == false;
+
+        public CreateRecipeViewModel(IRezeptService rezeptservice, IUserService userService, IAlertService alertService, IRezeptShareService shareService, IPreferenceService preferenceService) : base(alertService) 
+        {
+            this._rezeptService = rezeptservice;
+            this._userService = userService;
+            this._shareService = shareService;
+            this._preferenceService = preferenceService;
+
+            this.Recipe.USERNAME = this._userService.GetUsername();
 
             this.AllIngredients = new ObservableCollection<Ingredient>();
             this.FilteredIngredients = new ObservableCollection<Ingredient>();
@@ -136,7 +148,18 @@ namespace RezeptSafe.ViewModel
 
         public async Task QueryAllIngredients()
         {
-            var ingredients = await this.rezeptService.GetAllIngredientsAsync();
+            var ingredients = await this._rezeptService.GetAllIngredientsAsync();
+
+            if (this.AllUnits.Count == 0)
+            {
+                await this.QueryAllUnits();
+            }
+
+            if (this.AllUnits.Count == 0)
+            {
+                await this._alertService.ShowAlertAsync("Error", "Es konnten keine Eiheiten in der Datenbank gefunden werden");
+                return;
+            }
 
             if (this.FilteredIngredients?.Count != 0)
             {
@@ -145,13 +168,14 @@ namespace RezeptSafe.ViewModel
 
             foreach (var ingredient in ingredients)
             {
+                ingredient.Units = this.AllUnits;
                 this.AllIngredients?.Add(ingredient);
             }
         }
 
         public async Task QueryAllUtensils()
         {
-            var utensils = await this.rezeptService.GetAllUtensilsAsync();
+            var utensils = await this._rezeptService.GetAllUtensilsAsync();
 
             if(this.FilteredUtensils.Count != 0)
             {
@@ -166,7 +190,7 @@ namespace RezeptSafe.ViewModel
 
         public async Task QueryAllUnits()
         {
-            var units = await this.rezeptService.GetAllUnitsAsync();
+            var units = await this._rezeptService.GetAllUnitsAsync();
 
             if(this.AllUnits?.Count != 0)
             {
@@ -198,11 +222,11 @@ namespace RezeptSafe.ViewModel
 
                 await Shell.Current.GoToAsync(nameof(QRCodeScanner), true);
 
-                string? qrcodecontent = await this.shareService.WaitForScanAsync();
+                string? qrcodecontent = await this._shareService.WaitForScanAsync();
 
                 if (!string.IsNullOrEmpty(qrcodecontent))
                 {
-                    string recipeJSON = this.shareService.DecompressBase64ToJson(qrcodecontent);
+                    string recipeJSON = this._shareService.DecompressBase64ToJson(qrcodecontent);
 
                     Recipe? newRecipe = JsonSerializer.Deserialize<Recipe>(recipeJSON);
 
@@ -210,10 +234,10 @@ namespace RezeptSafe.ViewModel
 
                     if (newRecipe != null && newRecipe.IsValidRecipe(out error))
                     {
-                        if (await this.alertService.ShowAlertWithChoiceAsync($"Rezept {newRecipe.TITLE} erkannt", "Wollen sie das Rezept übernehmen", "Ja", "Nein"))
+                        if (await this._alertService.ShowAlertWithChoiceAsync($"Rezept {newRecipe.TITLE} erkannt", "Wollen sie das Rezept übernehmen", "Ja", "Nein"))
                         {
-                            await this.rezeptService.AddExternalRecipeAsync(newRecipe);
-                            await this.alertService.ShowAlertAsync("Rezept erfolgreich eingefügt", "");
+                            await this._rezeptService.AddExternalRecipeAsync(newRecipe);
+                            await this._alertService.ShowAlertAsync("Rezept erfolgreich eingefügt", "");
 
                             // Wenn das Rezept hinzugefügt wurde dann geht es zurück auf die Startseite
                             await Shell.Current.GoToAsync("..");
@@ -221,7 +245,7 @@ namespace RezeptSafe.ViewModel
                     }
                     else
                     {
-                        await this.alertService.ShowAlertAsync("Error", error.Item2);
+                        await this._alertService.ShowAlertAsync("Error", error.Item2);
                     }
 
                 }
@@ -229,6 +253,7 @@ namespace RezeptSafe.ViewModel
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
+                await this._alertService.ShowAlertAsync("Error", "Beim scannen ist ein Fehler aufgetreten");
             }
             finally
             {
@@ -244,25 +269,111 @@ namespace RezeptSafe.ViewModel
         [RelayCommand]
         async Task OnSaveClickedAsync()
         {
-            this.Recipe.Ingredients = this.AllIngredients.Where(x => x.IsSelected == true).ToList();
-
-            this.Recipe.Utensils = this.AllUtensils.Where(x => x.IsSelected == true).ToList();
-
-            if(!this.Recipe.IsValidRecipe(out Tuple<Step,string> error))
+            if(this.Recipe.ID >= 0)
             {
-                await this.alertService.ShowAlertAsync("Error", error.Item2);
-                this.Step = error.Item1;
-                this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
-                return;
-            }
+                this.Recipe.Ingredients = this.AllIngredients.Where(x => x.IsSelected == true).ToList();
 
-            if(await this.rezeptService.AddRecipeAsync(this.Recipe) == -1)
-            {
-                await this.alertService.ShowAlertAsync("Error", "Beim erstellen des Rezeptes ist ein Fehler aufgetreten");
+                this.Recipe.Utensils = this.AllUtensils.Where(x => x.IsSelected == true).ToList();
+
+                if (!this.Recipe.IsValidRecipe(out Tuple<Step, string> error))
+                {
+                    await this._alertService.ShowAlertAsync("Error", error.Item2);
+                    this.Step = error.Item1;
+                    this.Title = $"Schritt: {(int)this.Step}/{CreateRecipeViewModel.maxSteps}";
+                    return;
+                }
+
+                if (this.Recipe.ID == 0)
+                {
+                    // Neues Rezept
+                    if (await this._rezeptService.AddRecipeAsync(this.Recipe) == -1)
+                    {
+                        await this._alertService.ShowAlertAsync("Error", "Beim erstellen des Rezeptes ist ein Fehler aufgetreten");
+                    }
+                    else
+                    {
+                        if (this.Recipe.AttachImageFlag)
+                        {
+                            try
+                            {
+                                string sourcePath = this.Recipe.ImageSourcePath;
+
+                                var appImageDir = Path.Combine(FileSystem.AppDataDirectory, "images");
+
+                                if (!Directory.Exists(appImageDir))
+                                    Directory.CreateDirectory(appImageDir);
+
+                                File.Copy(sourcePath, this.Recipe.IMAGEPATH, overwrite: true);
+                            }
+                            catch (Exception ex)
+                            {
+                                System.Diagnostics.Debug.WriteLine(ex.Message);
+                                await this._alertService.ShowAlertAsync("Error", "Beim aktualisieren des Rezeptbildes ist ein Fehler aufgetreten");
+                                return;
+                            }
+                        }
+
+                        await Shell.Current.GoToAsync("..");
+                        await Shell.Current.GoToAsync(nameof(ListRecipesPage), true);
+                    }
+                }
+                else if(this.Recipe.ID > 0)
+                {
+                    // Rezept bearbeiten
+
+                    if (this.Recipe.DeleteImageFlag)
+                    {
+                        try
+                        {
+                            if (File.Exists(this.Recipe.IMAGEPATH))
+                            {
+                                File.Delete(this.Recipe.IMAGEPATH);
+                            }
+
+                            this.Recipe.IMAGEPATH = "";
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex.Message);
+                            await this._alertService.ShowAlertAsync("Error", "Beim aktualisieren des Rezeptes ist ein Fehler aufgetreten");
+                            return;
+                        }
+                    }
+                    else if (this.Recipe.AttachImageFlag)
+                    {
+                        try
+                        {
+                            string sourcePath = this.Recipe.ImageSourcePath;
+
+                            var appImageDir = Path.Combine(FileSystem.AppDataDirectory, "images");
+
+                            if (!Directory.Exists(appImageDir))
+                                Directory.CreateDirectory(appImageDir);
+
+                            File.Copy(sourcePath, this.Recipe.IMAGEPATH, overwrite: true);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine(ex.Message);
+                            await this._alertService.ShowAlertAsync("Error", "Beim aktualisieren des Rezeptbildes ist ein Fehler aufgetreten");
+                            return;
+                        }
+                    }
+
+                    if (await this._rezeptService.UpdateRecipeAsync(this.Recipe) == -1)
+                    {
+                        await this._alertService.ShowAlertAsync("Error", "Beim aktualisieren des Rezeptes ist ein Fehler aufgetreten");
+                    }
+                    else
+                    {
+                        await Shell.Current.GoToAsync("..");
+                        await Shell.Current.GoToAsync(nameof(ListRecipesPage), true);
+                    }
+                }
             }
             else
             {
-                await Shell.Current.GoToAsync(nameof(ListRecipesPage),true);
+                await this._alertService.ShowAlertAsync("Error", "Ein unvorhergesehner Programmfehler ist aufgetreten, bitte dem Entwickler bescheid sagen");
             }
         }
 
@@ -280,13 +391,20 @@ namespace RezeptSafe.ViewModel
 
                 this.Step = Step.Title;
                 this.Title = $"Schritt: 1/{CreateRecipeViewModel.maxSteps}";
+                this.ButtonText = "Rezept speichern";
+
+                string mediaPreference = this._preferenceService.GetPreference(Enum.RezeptbuchPreferences.MediaPermission);
+                this._mediaPreference = string.IsNullOrWhiteSpace(mediaPreference) || mediaPreference.Trim().Equals("true", StringComparison.OrdinalIgnoreCase);
+                OnPropertyChanged(nameof(IsMediaButtonVisible));
+                OnPropertyChanged(nameof(IsImageDeleteVisible));
 
                 await this.QueryAllIngredients();
                 await this.QueryAllUtensils();
-                await this.QueryAllUnits();
 
                 if(this.Recipe.ID > 0)
                 {
+                    this.ButtonText = "Rezept aktualisieren";
+
                     // Zutaten auswählen
                     foreach (var ingredient in this.Recipe.Ingredients)
                     {
@@ -294,6 +412,7 @@ namespace RezeptSafe.ViewModel
                         if(tempIngredient is not null)
                         {
                             tempIngredient.IsSelected = true;
+                            tempIngredient.AMOUNT = ingredient.AMOUNT;
 
                             var tempUnit = this.AllUnits.Where(x => x.UNIT == ingredient.UNIT).FirstOrDefault();
                             if (tempUnit is not null)
@@ -345,48 +464,148 @@ namespace RezeptSafe.ViewModel
         async Task CreateNewIngredientAsync()
         {
             Ingredient newIngredient = new Ingredient();
-            newIngredient.NAME = await this.alertService.ShowPromptAsync("Neue Zutat erstellen", "Name der Zutat");
+            newIngredient.NAME = await this._alertService.ShowPromptAsync("Neue Zutat erstellen", "Name der Zutat");
 
             if (!string.IsNullOrWhiteSpace(newIngredient.NAME))
             {
-                if (await this.rezeptService.AddIngredientAsync(newIngredient) == 1)
+                if (await this._rezeptService.AddIngredientAsync(newIngredient) == 1)
                 {
-                    await this.alertService.ShowAlertAsync("Info", $"Die Zutat {newIngredient.NAME} wurde erfolgreich erstellt");
+                    await this._alertService.ShowAlertAsync("Info", $"Die Zutat {newIngredient.NAME} wurde erfolgreich erstellt");
                     await this.QueryAllIngredients();
                     return;
                 }
                 else
                 {
-                    await this.alertService.ShowAlertAsync("Fehler", $"Die Zutat {newIngredient.NAME} wurde nicht erfolgreich erstellt");
+                    await this._alertService.ShowAlertAsync("Fehler", $"Die Zutat {newIngredient.NAME} wurde nicht erfolgreich erstellt");
                     return;
                 }
             }
 
-            await this.alertService.ShowAlertAsync("Fehler", "Der Zutatenname darf nicht leer sein");
+            await this._alertService.ShowAlertAsync("Fehler", "Der Zutatenname darf nicht leer sein");
         }
 
         [RelayCommand]
         async Task CreateNewUtensilAsync()
         {
             Utensil newUtensil = new Utensil();
-            newUtensil.NAME = await this.alertService.ShowPromptAsync("Neues Utensil erstellen", "Name der Utensilie");
+            newUtensil.NAME = await this._alertService.ShowPromptAsync("Neues Utensil erstellen", "Name der Utensilie");
 
             if (!string.IsNullOrWhiteSpace(newUtensil.NAME))
             {
-                if (await this.rezeptService.AddUtensilAsync(newUtensil) == 1)
+                if (await this._rezeptService.AddUtensilAsync(newUtensil) == 1)
                 {
-                    await this.alertService.ShowAlertAsync("Info", $"Die Utensilie {newUtensil.NAME} wurde erfolgreich erstellt");
+                    await this._alertService.ShowAlertAsync("Info", $"Die Utensilie {newUtensil.NAME} wurde erfolgreich erstellt");
                     await this.QueryAllUtensils();
                     return;
                 }
                 else
                 {
-                    await this.alertService.ShowAlertAsync("Fehler", $"Die Utensilie {newUtensil.NAME} wurde nicht erfolgreich erstellt");
+                    await this._alertService.ShowAlertAsync("Fehler", $"Die Utensilie {newUtensil.NAME} wurde nicht erfolgreich erstellt");
                     return;
                 }
             }
 
-            await this.alertService.ShowAlertAsync("Fehler", "Der Utensilienname darf nicht leer sein");
+            await this._alertService.ShowAlertAsync("Fehler", "Der Utensilienname darf nicht leer sein");
+        }
+
+        [RelayCommand]
+        async Task ChooseRecipeImageAsync()
+        {
+            var permissionStatus = await Permissions.CheckStatusAsync<Permissions.Media>();
+            
+            string mediaPreference = this._preferenceService.GetPreference(Enum.RezeptbuchPreferences.MediaPermission);
+
+            bool allowMedia;
+            
+            if (string.IsNullOrWhiteSpace(mediaPreference))
+            {
+                // Keine Medienpräferenz gesetzt
+                // deswegen setzt ich das default auf true damit ich die permissions abfragen kann
+                allowMedia = await this._alertService.ShowAlertWithChoiceAsync("Info", "Darf die App Bilder aus deiner Galerie durchsuchen ?", "Ja", "Nein");
+
+                if (allowMedia)
+                {
+                    this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.MediaPermission, "true");
+                }
+                else
+                {
+                    await this._alertService.ShowAlertAsync("Info", "Die App wird dich nicht mehr nach Zugriff auf deine Bilder fragen");
+                    return;
+                }
+            }
+            else
+            {
+                mediaPreference = mediaPreference.Trim();
+                allowMedia = mediaPreference.Equals("true", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (allowMedia)
+            {
+                if (permissionStatus != PermissionStatus.Granted)
+                {
+                    permissionStatus = await Permissions.RequestAsync<Permissions.Media>();
+
+                    if (permissionStatus != PermissionStatus.Granted)
+                    {
+                        this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.MediaPermission, "false");
+                        await this._alertService.ShowAlertAsync("Info", "Sie können ab jetzt keine Bilder mehr zu ihren Rezepten speichern. Wenn sie doch wieder welche speichern wollen können sie das in den Einstellungen anpassen");
+                        return;
+                    }
+                }
+
+                try
+                {
+                    var imagefile = await MediaPicker.PickPhotoAsync(new MediaPickerOptions
+                    {
+                        Title = "Wählen sie ein Bild",
+                    });
+
+                    if(imagefile is not null)
+                    {                        
+                        string fileName = Guid.NewGuid().ToString() + ".jpg";
+                        var appImageDir = Path.Combine(FileSystem.AppDataDirectory, "images");
+                        var destPath = Path.Combine(appImageDir, fileName);
+
+                        this.Recipe.ImageSourcePath = imagefile.FullPath;
+                        this.Recipe.IMAGEPATH = destPath;
+                        this.Recipe.AttachImageFlag = true;
+                        this.Recipe.DeleteImageFlag = false;
+
+                        await this._alertService.ShowAlertAsync("Info", "Die Änderung wird erst mit der aktualisierung angewendet");
+
+                        OnPropertyChanged(nameof(IsMediaButtonVisible));
+                        OnPropertyChanged(nameof(IsImageDeleteVisible));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    await this._alertService.ShowAlertAsync("Error", "Beim auswählen des Bildes ist ein Fehler aufgetreten");
+                }
+            }
+        }
+
+        [RelayCommand]
+        async Task RemoveRecipeImageAsync()
+        {
+            if (await this._alertService.ShowAlertWithChoiceAsync("Warnung", "Wollen sie das Bild für dieses Rezept entfernen? Diese Aktion kann nicht rückgängig gemacht werden.", "Ja", "Nein"))
+            {
+                try
+                {
+                    this.Recipe.DeleteImageFlag = true;
+                    this.Recipe.AttachImageFlag = false;
+
+                    await this._alertService.ShowAlertAsync("Info", "Die Änderung wird erst mit der aktualisierung angewendet");
+
+                    OnPropertyChanged(nameof(IsMediaButtonVisible));
+                    OnPropertyChanged(nameof(IsImageDeleteVisible));
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    await this._alertService.ShowAlertAsync("Error", "Beim entfernen des Bildes ist ein Fehler aufgetreten");
+                }
+            }
         }
     }
 }
