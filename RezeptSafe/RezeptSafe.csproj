@@ -75,6 +75,9 @@
 	  <Compile Update="View\ListRecipes.xaml.cs">
 	    <DependentUpon>ListRecipes.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="View\IngredientListPage.xaml.cs">
+	    <DependentUpon>IngredientListPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="View\QRCodeScanner.xaml.cs">
 	    <DependentUpon>QRCodeScanner.xaml</DependentUpon>
 	  </Compile>
@@ -99,6 +102,9 @@
 	  <MauiXaml Update="View\LandingPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="View\IngredientListPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="View\QRCodeScanner.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -112,6 +118,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="View\SettingsPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\UnitListPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="View\UtensilListPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

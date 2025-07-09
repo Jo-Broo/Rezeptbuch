@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:model="clr-namespace:RezeptSafe.Model"
+             xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
+             x:Class="RezeptSafe.View.UtensilListPage"
+             x:DataType="viewmodel:UtensilListViewModel"
+             Title="{Binding Title}">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <ActivityIndicator 
+            IsVisible="{Binding IsBusy}" 
+            IsRunning="{Binding IsBusy}" 
+            HorizontalOptions="Center" 
+            VerticalOptions="Center" 
+            Grid.Row="0"
+            Grid.RowSpan="2"/>
+
+        <Frame Grid.Row="1" Padding="5" IsVisible="{Binding AllUtensils.Count, Converter={StaticResource NumberToBoolConverter}}">
+            <SearchBar Placeholder="Utensilienname" Text="{Binding UtensilSearchtext}"/>
+        </Frame>
+
+        <CollectionView 
+    Grid.Row="2"
+    ItemsSource="{Binding FilteredUtensils}">
+            <CollectionView.EmptyView>
+                <Grid RowDefinitions="*,auto,*">
+                    <Frame Margin="10" CornerRadius="10" Grid.Row="1">
+                        <VerticalStackLayout>
+                            <Label Text="Es befinden sich momentan keine Zutaten in ihrer Datenbank" FontSize="20"/>
+                            <Button Text="Neues Utensil erstellen" Command="{Binding CreateNewUtensilCommand}"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:Utensil">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Execute">
+                                <SwipeItemView Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:UtensilListViewModel}}, Path=RemoveUtensilCommand}" CommandParameter="{Binding .}">
+                                    <Button Text="&#xf1f8;" FontFamily="FontAwesomeSolid" BackgroundColor="Red"/>
+                                </SwipeItemView>
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Frame CornerRadius="10" Margin="10">
+                            <Label Text="{Binding NAME}"/>
+                        </Frame>
+                    </SwipeView>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+</ContentPage>

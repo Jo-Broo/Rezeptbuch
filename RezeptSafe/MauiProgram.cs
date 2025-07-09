@@ -43,6 +43,9 @@ namespace RezeptSafe
             builder.Services.AddTransient<ProfilViewModel>();
             builder.Services.AddTransient<SettingsViewModel>();
             builder.Services.AddTransient<LandingPageViewModel>();
+            builder.Services.AddTransient<IngredientListViewModel>();
+            builder.Services.AddTransient<UtensilListViewModel>();
+            builder.Services.AddTransient<UnitListViewModel>();
             // Pages
             builder.Services.AddSingleton<LandingPage>();
             builder.Services.AddSingleton<ListRecipesPage>();
@@ -51,6 +54,9 @@ namespace RezeptSafe
             builder.Services.AddTransient<CreateRecipePage>();
             builder.Services.AddTransient<ProfilPage>();
             builder.Services.AddTransient<QRCodeScanner>();
+            builder.Services.AddTransient<IngredientListPage>();
+            builder.Services.AddTransient<UtensilListPage>();
+            builder.Services.AddTransient<UnitListPage>();
 
             return builder.Build();
         }

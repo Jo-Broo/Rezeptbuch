@@ -11,7 +11,7 @@ namespace RezeptSafe.Model
 {
     public partial class Ingredient : ObservableObject
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string NAME { get; set; } = string.Empty;
         public string DESCRIPTION { get; set; } = string.Empty;
         public double AMOUNT { get; set; }

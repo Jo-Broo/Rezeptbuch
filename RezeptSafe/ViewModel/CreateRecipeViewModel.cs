@@ -96,21 +96,12 @@ namespace RezeptSafe.ViewModel
 
         partial void OnIngredientSearchTextChanged(string value)
         {
-            FilterIngredients(value);
-        }
-        partial void OnUtensilSearchTextChanged(string value)
-        {
-            FilterUtensils(value);
-        }
-
-        void FilterIngredients(string query)
-        {
             this.IsBusy = true;
             this.FilteredIngredients.Clear();
 
-            if (!string.IsNullOrWhiteSpace(query))
+            if (!string.IsNullOrWhiteSpace(value))
             {
-                Regex regex = new Regex($"^{Regex.Escape(query)}.*$", RegexOptions.IgnoreCase);
+                Regex regex = new Regex($"^{Regex.Escape(value)}.*$", RegexOptions.IgnoreCase);
 
                 this.FilteredIngredients = new ObservableCollection<Ingredient>(this.AllIngredients.Where(i => regex.IsMatch(i.NAME)));
             }
@@ -121,17 +112,18 @@ namespace RezeptSafe.ViewModel
                     this.FilteredIngredients.Add(ingredient);
                 }
             }
-            
+
             this.IsBusy = false;
         }
-        void FilterUtensils(string query)
+
+        partial void OnUtensilSearchTextChanged(string value)
         {
             this.IsBusy = true;
             this.FilteredUtensils.Clear();
 
-            if (!string.IsNullOrWhiteSpace(query))
+            if (!string.IsNullOrWhiteSpace(value))
             {
-                Regex regex = new Regex($"^{Regex.Escape(query)}.*$", RegexOptions.IgnoreCase);
+                Regex regex = new Regex($"^{Regex.Escape(value)}.*$", RegexOptions.IgnoreCase);
 
                 this.FilteredUtensils = new ObservableCollection<Utensil>(this.AllUtensils.Where(i => regex.IsMatch(i.NAME)));
             }
@@ -150,17 +142,6 @@ namespace RezeptSafe.ViewModel
         {
             var ingredients = await this._rezeptService.GetAllIngredientsAsync();
 
-            if (this.AllUnits.Count == 0)
-            {
-                await this.QueryAllUnits();
-            }
-
-            if (this.AllUnits.Count == 0)
-            {
-                await this._alertService.ShowAlertAsync("Error", "Es konnten keine Eiheiten in der Datenbank gefunden werden");
-                return;
-            }
-
             if (this.FilteredIngredients?.Count != 0)
             {
                 this.FilteredIngredients?.Clear();
@@ -168,7 +149,6 @@ namespace RezeptSafe.ViewModel
 
             foreach (var ingredient in ingredients)
             {
-                ingredient.Units = this.AllUnits;
                 this.AllIngredients?.Add(ingredient);
             }
         }
@@ -192,19 +172,25 @@ namespace RezeptSafe.ViewModel
         {
             var units = await this._rezeptService.GetAllUnitsAsync();
 
-            if(this.AllUnits?.Count != 0)
+            if (units.Count == 0)
             {
-                this.AllUnits?.Clear();
-            }
-
-            foreach (var unit in units)
-            {
-                this.AllUnits?.Add(unit);
+                await this._alertService.ShowAlertAsync("Error", "Es konnten keine Eiheiten in der Datenbank gefunden werden");
+                return;
             }
 
             if(this.AllUnits is null)
             {
                 return;
+            }
+
+            if (this.AllUnits.Count != 0)
+            {
+                this.AllUnits.Clear();
+            }
+
+            foreach (var unit in units)
+            {
+                this.AllUnits.Add(unit);
             }
 
             foreach (var ingredient in this.AllIngredients)
@@ -400,6 +386,7 @@ namespace RezeptSafe.ViewModel
 
                 await this.QueryAllIngredients();
                 await this.QueryAllUtensils();
+                await this.QueryAllUnits();
 
                 if(this.Recipe.ID > 0)
                 {
@@ -419,6 +406,10 @@ namespace RezeptSafe.ViewModel
                             {
                                 tempIngredient.SelectedUnit = tempUnit;
                             }
+                            else
+                            {
+                                throw new Exception($"Es konnte keine passende Einheit zur Zutat [{ingredient.NAME}] gefunden werden");
+                            }
                         }
                     }
 
@@ -432,8 +423,8 @@ namespace RezeptSafe.ViewModel
                         }
                     }
 
-                    this.FilterIngredients("");
-                    this.FilterUtensils("");
+                    this.OnIngredientSearchTextChanged("");
+                    this.OnUtensilSearchTextChanged("");
                 }
             }
             catch (Exception ex)

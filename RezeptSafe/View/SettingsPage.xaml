@@ -15,10 +15,7 @@
         <HorizontalStackLayout Spacing="20">
             <CheckBox IsChecked="{Binding ShowAdvancedOptions}" 
               VerticalOptions="Center" />
-            <Label Text="Erweiterte Datenbankoptionen anzeigen"
-                   WidthRequest="300"
-           FontSize="20" 
-           VerticalOptions="Center" />
+            <Label Text="Erweiterte Datenbankoptionen anzeigen" Style="{StaticResource SettingsTitleLabelStyle}"/>
         </HorizontalStackLayout>
 
         <Button IsVisible="{Binding ShowAdvancedOptions}"

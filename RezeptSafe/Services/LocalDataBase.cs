@@ -1,43 +1,42 @@
 ﻿using RezeptSafe.Interfaces;
 using RezeptSafe.Model;
 using SQLite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static SQLite.SQLite3;
+using System.Text.Json;
 
 namespace RezeptSafe.Services
 {
     public class LocalDataBase : IRezeptService
     {
         #region Attribute
-        private SQLiteAsyncConnection _connection;
+        private SQLiteAsyncConnection? _connection;
         public bool DBFileFound { get; private set; }
+        public string DBFile { get; private set; }
         #endregion
 
         public LocalDataBase() 
         {
-            this.DBFileFound = File.Exists(DBConstants.DbPath);
+            this.DBFile = DBConstants.DbPath;
+            this.DBFileFound = File.Exists(this.DBFile);
             if (!this.DBFileFound)
             {
                 Task.Run(async () => {await this.InitializeDataBase(true);});
             }
         }
-
-        public SQLiteAsyncConnection GetConnection(string databaseFile = "")
+        public LocalDataBase(string dbFile)
         {
-            if (this._connection == null)
+            this.DBFile = dbFile;
+            this.DBFileFound = File.Exists(this.DBFile);
+            if (!this.DBFileFound)
             {
-                if(databaseFile == "")
-                {
-                    this._connection = new SQLiteAsyncConnection(DBConstants.DbPath);
-                }
-                else
-                {
-                    this._connection = new SQLiteAsyncConnection(databaseFile);
-                }
+                Task.Run(async () => { await this.InitializeDataBase(true); });
+            }
+        }
+
+        public SQLiteAsyncConnection GetConnection()
+        {
+            if(this._connection is null)
+            {
+                this._connection = new SQLiteAsyncConnection(this.DBFile);
             }
 
             return this._connection;
@@ -350,6 +349,175 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<bool> MergeDatabases(IRezeptService external, IProgressReporter progress)
+        {
+            try
+            {
+                List<Ingredient> newIngredients = await external.GetAllIngredientsAsync();
+                List<Unit> newUnits = await external.GetAllUnitsAsync();
+                List<Utensil> newUtensils = await external.GetAllUtensilsAsync();
+                List<Recipe> newRecipes = await external.GetAllRecipesAsync();
+
+                progress.Initialize(newRecipes.Count,newIngredients.Count,newUnits.Count,newUtensils.Count);
+                progress.SetStatus("Kombinierungsvorgang wird gestartet");
+
+                for ( int i = 0; i < newIngredients.Count; i++)
+                {
+                    Recipe recipe = newRecipes[i];
+                    progress.SetStatus($"Bearbeitung von Rezept [{i+1}/{newRecipes.Count}]");
+
+                    // Zutaten des Rezeptes aktualisieren oder neu erstellen
+                    foreach (var ingredient in recipe.Ingredients)
+                    {
+                        Ingredient? availableIngredient = await this.IngredientPresentInDatabase(ingredient);
+                        if(availableIngredient is null)
+                        {
+                            // Es wurde keine passende Zutat gefunden
+                            if(await this.AddIngredientAsync(ingredient) == 1)
+                            {
+                                // Die neue Zutat wurde erfolgreich hinzugefügt
+                                // Die ID der Zutat muss aktualisiert werden
+                                ingredient.ID = await this.GetLastIngredientIDAsync();
+                            }
+                            else
+                            {
+                                throw new Exception("Beim hinzufügen der externen Zutaten ist Fehler aufgetreten. Der Vorgang wird abgebrochen.");
+                            }
+                        }
+                        else
+                        {
+                            // Es wurde eine passende Zutat gefunden
+                            ingredient.ID = availableIngredient.ID;
+                        }
+                        // Die Zutat kann nun aus der Liste der neuen Zutaten entfernt werden
+                        newIngredients.Remove(ingredient);
+
+                        await progress.PerformStep("Kombinierung der Zutaten");
+                        ingredient.SelectedUnit = new Unit() { ID = ingredient.UNITID, UNIT = ingredient.UNIT };
+                        Unit? availableUnit = await this.UnitPresentInDatabase(ingredient.SelectedUnit);
+                        if (availableUnit is null)
+                        {
+                            // Es wurde keine passende Einheit gefunden
+                            if(await this.AddUnitAsync(ingredient.SelectedUnit) == 1)
+                            {
+                                // Die Einheit wurde angelegt
+                                ingredient.SelectedUnit.ID = await this.GetLastUnitIDAsync();
+                            }
+                            else
+                            {
+                                throw new Exception("Beim hinzufügen der externen Einheiten ist ein Fehler aufgetreten");
+                            }
+                        }
+                        else
+                        {
+                            // Es wurde eine passende Einheit gefunden
+                            ingredient.SelectedUnit.ID = availableUnit.ID;
+                        }
+                        // Die Einheit kann nun aus der Liste der neuen Einheiten entfernt werden
+                        newUnits.Remove(ingredient.SelectedUnit);
+
+                        await progress.PerformStep("Kombinierung der Einheiten");
+                    }
+
+                    // Utensilien des Rezeptes aktualisieren oder neu erstellen
+                    foreach (var utensil in recipe.Utensils)
+                    {
+                        Utensil? availableUtensil = await this.UtensilPresentInDatabase(utensil);
+                        if (availableUtensil is null)
+                        {
+                            // Kein passendes Utensil gefunden
+                            if(await this.AddUtensilAsync(utensil) == 1)
+                            {
+                                // Das neue Utensil wurde angelegt
+                                utensil.ID = await this.GetLastUtensilIDAsync();
+                            }
+                            else
+                            {
+                                throw new Exception("Beim hinzufügen der externen Utensilien ist ein Fehler aufgetreten");
+                            }
+                        }
+                        else
+                        {
+                            // Es wurde ein passendes Utensil gefunden
+                            utensil.ID = availableUtensil.ID;
+                        }
+                        // Das Utensil kann nun aus der Liste der neuen Utensilien entfernt werden
+                        newUtensils.Remove(utensil);
+
+                        await progress.PerformStep("Kombinierung der Utensilien");
+                    }
+
+                    if(await this.AddRecipeAsync(recipe) == -1)
+                    {
+                        throw new Exception("Beim einfügen der externen Rezepte ist ein Fehler aufgetreten");
+                    }
+
+                    await progress.PerformStep("");
+                }
+
+                // Einfügen der restlichen Zutaten
+                foreach (var ingredient in newIngredients)
+                {
+                    Ingredient? availableIngredient = await this.IngredientPresentInDatabase(ingredient);
+                    if (availableIngredient is null) 
+                    {
+                        if(await this.AddIngredientAsync(ingredient) == -1)
+                        {
+                            throw new Exception("Beim einfügen der erternen Zutaten ist ein Fehler aufgetreten");
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    await progress.PerformStep("Kombinierung der Zutaten");
+                }
+
+                // Einfügen der restlichen Einheiten
+                foreach (var unit in newUnits)
+                {
+                    Unit? availableUnit = await this.UnitPresentInDatabase(unit);
+                    if(availableUnit is null)
+                    {
+                        if(await this.AddUnitAsync(unit) == -1)
+                        {
+                            throw new Exception("Beim einfügen der externen Einheiten ist ein Fehler aufgetreten");
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    await progress.PerformStep("Kombinierung der Einheiten");
+                }
+
+                // Einfügen der restlichen Utensilien
+                foreach (var utensil in newUtensils)
+                {
+                    Utensil? availableUtensil = await this.UtensilPresentInDatabase(utensil);
+                    if (availableUtensil is null)
+                    {
+                        if(await this.AddUtensilAsync(utensil) == -1)
+                        {
+                            throw new Exception("Beim einfügen der externen Utensilien ist ein Fehler aufgetreten");
+                        }
+                        else
+                        {
+                            throw new Exception();
+                        }
+                    }
+                    await progress.PerformStep("Kombinierung der Utensilien");
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex);
+                return false;
+            }
+        }
+
         public async Task<List<Recipe>> GetAllRecipesAsync()
         {
             try
@@ -357,6 +525,7 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
 
                 string sql = @"SELECT * FROM RECIPE";
+
                 var result = await conn.QueryAsync<Recipe>(sql);
 
                 if (result.Count == 0)
@@ -376,6 +545,98 @@ namespace RezeptSafe.Services
                 return new List<Recipe>();
             }
         }
+        public async Task<List<Recipe>> GetAllRecipesWithIngredientAsync(Ingredient ingredient)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+                string sql = @"SELECT RECIPEID AS ID FROM RECIPEINGREDIENT WHERE INGREDIENTID = ?";
+
+                var result = await conn.QueryAsync<Recipe>(sql,ingredient.ID);
+
+                if (result.Count == 0)
+                    throw new Exception("Keine Rezepte gefunden.");
+
+                List<Recipe> recipes = new List<Recipe>();
+                foreach (var recipe in result)
+                {
+                    var tmprecipe = await this.GetRecipeAsync(recipe.ID);
+                    if(tmprecipe is not null)
+                    {
+                        recipes.Add(tmprecipe);
+                    }
+                }
+
+                return recipes;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return new List<Recipe>();
+            }
+        }
+        public async Task<List<Recipe>> GetAllRecipesWithUnitAsync(Unit unit)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT RECIPEID AS ID FROM RECIPEINGREDIENT WHERE UNITID = ?";
+                
+                var result = await conn.QueryAsync<Recipe>(sql,unit.ID);
+
+                if (result.Count == 0)
+                    throw new Exception("Keine Rezepte gefunden.");
+
+                List<Recipe> recipes = new List<Recipe>();
+                foreach (var recipe in result)
+                {
+                    var tmprecipe = await this.GetRecipeAsync(recipe.ID);
+                    if (tmprecipe is not null)
+                    {
+                        recipes.Add(tmprecipe);
+                    }
+                }
+
+                return recipes;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return new List<Recipe>();
+            }
+        }
+        public async Task<List<Recipe>> GetAllRecipesWithUtensilAsync(Utensil utensil)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT RECIPEID AS ID FROM RECIPEUTENSIL WHERE UTENSILID = ?";
+
+                var result = await conn.QueryAsync<Recipe>(sql, utensil.ID);
+
+                if (result.Count == 0)
+                    throw new Exception("Keine Rezepte gefunden.");
+
+                List<Recipe> recipes = new List<Recipe>();
+                foreach (var recipe in result)
+                {
+                    var tmprecipe = await this.GetRecipeAsync(recipe.ID);
+                    if (tmprecipe is not null)
+                    {
+                        recipes.Add(tmprecipe);
+                    }
+                }
+
+                return recipes;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return new List<Recipe>();
+            }
+        }
         public async Task<Recipe?> GetRecipeAsync(int id)
         {
             Recipe? recipe = null;
@@ -385,7 +646,7 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
 
                 string sql = @"SELECT * FROM RECIPE WHERE ID = ?";
-                var result = await conn.QueryAsync<Recipe>(sql);
+                var result = await conn.QueryAsync<Recipe>(sql, id);
 
                 recipe = result.FirstOrDefault();
 
@@ -406,6 +667,8 @@ namespace RezeptSafe.Services
         {
             try
             {
+                //System.Diagnostics.Debug.WriteLine(JsonSerializer.Serialize(recipe));
+
                 var conn = this.GetConnection();
                 string sql = @"INSERT INTO RECIPE(TITLE,DESCRIPTION,TIME,USERNAME,IMAGEPATH) 
                                VALUES
@@ -524,12 +787,12 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
 
                 string sql = @"SELECT MAX(ID) AS ID FROM RECIPE";
-                var result = await conn.ExecuteScalarAsync<int?>(sql);
 
-                if (result == null)
-                    throw new Exception("Keine Rezepte vorhanden.");
+                var result = await conn.QueryAsync<Recipe>(sql) ?? throw new Exception("Bei der SQL-Abfrage ist ein Fehler aufgetreten");
 
-                return result.Value;
+                int lastID = result.FirstOrDefault()?.ID ?? -1;
+
+                return lastID;
             }
             catch (Exception ex)
             {
@@ -554,7 +817,7 @@ namespace RezeptSafe.Services
                     {
                         // Zutat muss noch erstellt werden
                         await this.AddIngredientAsync(ingredient);
-                        ingredient.Id = await this.GetLastIngredientIDAsync();
+                        ingredient.ID = await this.GetLastIngredientIDAsync();
                         tmp = ingredient;
                     }
                     // Zutat ist bereits vorhanden
@@ -636,7 +899,7 @@ namespace RezeptSafe.Services
             {
                 var conn = this.GetConnection();
 
-                string sql = @"DELETE * FROM INGREDIENT WHERE ID = ?";
+                string sql = @"DELETE FROM INGREDIENT WHERE ID = ?";
 
                 return await conn.ExecuteAsync(sql, id);
             }
@@ -694,7 +957,7 @@ namespace RezeptSafe.Services
 
                 string sql = @"INSERT INTO RECIPEINGREDIENT(RECIPEID,INGREDIENTID,AMOUNT,UNITID) VALUES (?,?,?,?)";
 
-                return await conn.ExecuteAsync(sql, recipeId,ingredient.Id,ingredient.AMOUNT,unit.ID);
+                return await conn.ExecuteAsync(sql, recipeId,ingredient.ID,ingredient.AMOUNT,unit.ID);
             }
             catch (Exception ex)
             {
@@ -777,12 +1040,12 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
 
                 string sql = @"SELECT MAX(ID) AS ID FROM INGREDIENT";
-                var result = await conn.ExecuteScalarAsync<int?>(sql);
 
-                if (result == null)
-                    throw new Exception("Keine Rezepte vorhanden.");
+                var result = await conn.QueryAsync<Ingredient>(sql) ?? throw new Exception("Bei der SQL-Abfrage ist ein Fehler aufgetreten");
 
-                return result.Value;
+                int lastID = result.FirstOrDefault()?.ID ?? -1;
+
+                return lastID;
             }
             catch (Exception ex)
             {
@@ -790,6 +1053,25 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<Ingredient?> GetIngredientByIDAsync(int ingredientID)
+        {            
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT * FROM INGREDIENT WHERE ID = ?";
+
+                var result = await conn.QueryAsync<Ingredient>(sql, ingredientID);
+
+                return result.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
+
         public async Task<List<Unit>> GetAllUnitsAsync()
         {
             try
@@ -808,6 +1090,27 @@ namespace RezeptSafe.Services
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
                 return new List<Unit>();
+            }
+        }
+        public async Task<int> AddUnitAsync(Unit unit)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(unit.UNIT))
+                {
+                    throw new Exception("Der Name der Einheit darf nicht leer sein");
+                }
+
+                var conn = this.GetConnection();
+
+                string sql = @"INSERT INTO UNIT(UNIT) VALUES(?);";
+
+                return await conn.ExecuteAsync(sql, unit.ID);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
             }
         }
         public async Task<Unit?> UnitPresentInDatabase(Unit unit)
@@ -833,6 +1136,60 @@ namespace RezeptSafe.Services
 
             return result;
         }
+        public async Task<int> GetLastUnitIDAsync()
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT MAX(ID) AS ID FROM UNIT";
+
+                var result = await conn.QueryAsync<Unit>(sql) ?? throw new Exception("Bei der SQL-Abfrage ist ein Fehler aufgetreten");
+                
+                int lastID = result.FirstOrDefault()?.ID ?? -1;
+
+                return lastID;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+        public async Task<int> DeleteUnitAsync(int unitID)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"DELETE FROM UNIT WHERE ID = ?";
+
+                return await conn.ExecuteAsync(sql, unitID);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return -1;
+            }
+        }
+        public async Task<Unit?> GetUnitByIDAsync(int unitID)
+        {
+            try
+            {
+                var conn = this.GetConnection();
+
+                string sql = @"SELECT * FROM UNIT WHERE ID = ?";
+
+                var result = await conn.QueryAsync<Unit>(sql,unitID);
+
+                return result.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
 
         public async Task<int> AddUtensilAsync(Utensil utensil)
         {
@@ -850,15 +1207,15 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
-        public async Task<int> DeleteUtensilAsync(int id)
+        public async Task<int> DeleteUtensilAsync(int utensilID)
         {
             try
             {
                 var conn = this.GetConnection();
 
-                string sql = @"DELETE * FROM UTENSIL WHERE ID = ?";
+                string sql = @"DELETE FROM UTENSIL WHERE ID = ?";
 
-                return await conn.ExecuteAsync(sql, id);
+                return await conn.ExecuteAsync(sql, utensilID);
             }
             catch (Exception ex)
             {
@@ -965,12 +1322,12 @@ namespace RezeptSafe.Services
                 var conn = this.GetConnection();
 
                 string sql = @"SELECT MAX(ID) AS ID FROM UTENSIL";
-                var result = await conn.ExecuteScalarAsync<int?>(sql);
 
-                if (result == null)
-                    throw new Exception("Keine Rezepte vorhanden.");
+                var result = await conn.QueryAsync<Utensil>(sql) ?? throw new Exception("Bei der SQL-Abfrage ist ein Fehler aufgetreten");
 
-                return result.Value;
+                int lastID = result.FirstOrDefault()?.ID ?? -1;
+
+                return lastID;
             }
             catch (Exception ex)
             {
@@ -978,7 +1335,23 @@ namespace RezeptSafe.Services
                 return -1;
             }
         }
+        public async Task<Utensil?> GetUtensilByID(int utensilID)
+        {
+            try
+            {
+                var conn = this.GetConnection();
 
-        
+                string sql = @"SELECT * FROM UTENSIL WHERE ID = ?";
+
+                var result = await conn.QueryAsync<Utensil>(sql, utensilID);
+
+                return result.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+                return null;
+            }
+        }
     }
 }

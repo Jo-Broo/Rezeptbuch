@@ -5,12 +5,16 @@ namespace RezeptSafe.Interfaces
 {
     public interface IRezeptService
     {
-        SQLiteAsyncConnection GetConnection(string databaseFile = "");
+        SQLiteAsyncConnection GetConnection();
         Task<int> InitializeDataBase(bool prePopulate);
         Task CloseConnection();
+        Task<bool> MergeDatabases(IRezeptService external, IProgressReporter progress);
 
         // Rezepte
         Task<List<Recipe>> GetAllRecipesAsync();
+        Task<List<Recipe>> GetAllRecipesWithIngredientAsync(Ingredient ingredient);
+        Task<List<Recipe>> GetAllRecipesWithUnitAsync(Unit unit);
+        Task<List<Recipe>> GetAllRecipesWithUtensilAsync(Utensil utensil);
         Task<Recipe?> GetRecipeAsync(int recipeID);
         Task<int> AddRecipeAsync(Recipe recipe);
         Task<int> UpdateRecipeAsync(Recipe recipe);
@@ -28,9 +32,16 @@ namespace RezeptSafe.Interfaces
         Task<int> RemoveAllIngredientsFromRecipeAsync(int recipeID);
         Task<Ingredient?> IngredientPresentInDatabase(Ingredient ingredient);
         Task<int> GetLastIngredientIDAsync();
-        Task<List<Unit>> GetAllUnitsAsync();
-        Task<Unit?> UnitPresentInDatabase(Unit unit);
+        Task<Ingredient?> GetIngredientByIDAsync(int ingredientID);
  
+        // Einheiten
+        Task<List<Unit>> GetAllUnitsAsync();
+        Task<int> AddUnitAsync(Unit unit);
+        Task<Unit?> UnitPresentInDatabase(Unit unit);
+        Task<int> GetLastUnitIDAsync();
+        Task<int> DeleteUnitAsync(int unitID);
+        Task<Unit?> GetUnitByIDAsync(int unitID);
+
         // Utensilien
         Task<List<Utensil>> GetAllUtensilsAsync();
         Task<int> AddUtensilAsync(Utensil utensil);
@@ -41,6 +52,7 @@ namespace RezeptSafe.Interfaces
         Task<int> RemoveAllUtensilsFromRecipeAsync(int recipeID);
         Task<Utensil?> UtensilPresentInDatabase(Utensil utensil);
         Task<int> GetLastUtensilIDAsync();
+        Task<Utensil?> GetUtensilByID(int utensilID);
     }
 
     public static class DBConstants

@@ -63,6 +63,7 @@
                                 <HorizontalStackLayout Grid.Column="2" IsVisible="{Binding IsSelected}">
                                     <Entry Keyboard="Numeric" WidthRequest="50" Text="{Binding AMOUNT}"/>
                                     <Picker Title="Einheit" WidthRequest="50" ItemsSource="{Binding Units}" ItemDisplayBinding="{Binding UNIT}" SelectedItem="{Binding SelectedUnit}"/>
+                                    <!--<Picker Title="Einheit" WidthRequest="50" ItemsSource="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:CreateRecipeViewModel}}, Path=AllUnits}" ItemDisplayBinding="{Binding UNIT}" SelectedItem="{Binding SelectedUnit}"/>-->
                                 </HorizontalStackLayout>
                             </Grid>
                         </DataTemplate>

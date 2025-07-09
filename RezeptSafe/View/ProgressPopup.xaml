@@ -2,11 +2,11 @@
 <mct:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
-            x:Class="RezeptSafe.View.ProgressPopup">
+           x:Class="RezeptSafe.View.ProgressPopup">
 
     <VerticalStackLayout Padding="20" Spacing="10">
 
-        <Label x:Name="TitleLabel"
+        <Label x:Name="StatusLabel"
            Text="Bitte warten..."
            FontAttributes="Bold"
            FontSize="18"
@@ -15,6 +15,9 @@
                 FontSize="18"
                 TextColor="Black"/>
         <Label x:Name="IngredientCount"
+                FontSize="18"
+                TextColor="Black"/>
+        <Label x:Name="UnitCount"
                 FontSize="18"
                 TextColor="Black"/>
         <Label x:Name="UtensilCount"

@@ -55,18 +55,6 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!--<Button Text="Neues Rezept erstellen"
-                Command="{Binding GoToCreateRecipeCommand}"
-                Grid.Row="1"
-                Grid.ColumnSpan="2"
-                Margin="10"/>-->
-        
-        <!--<Button Text="Rezepte abfragen"
-                Command="{Binding GetRecipesCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                Grid.Row="1"
-                Margin="8"/>-->
-
         <ActivityIndicator IsVisible="{Binding IsBusy}"
                            IsRunning="{Binding IsBusy}"
                            HorizontalOptions="Fill"

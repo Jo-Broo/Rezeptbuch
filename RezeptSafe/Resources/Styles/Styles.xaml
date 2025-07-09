@@ -514,5 +514,15 @@
         <Setter Property="FontAttributes" Value="Bold" />
         <Setter Property="TextColor" Value="{AppThemeBinding Light=#222222, Dark=White}" />
     </Style>
+    
+    <!-- Settings -->
+    
+    <Style x:Key="SettingsTitleLabelStyle" TargetType="Label">
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="FontAttributes" Value="Bold" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light=#222222, Dark=White}" />
+        <Setter Property="VerticalOptions" Value="Center"/>
+        <Setter Property="WidthRequest" Value="250" />
+    </Style>
 
 </ResourceDictionary>

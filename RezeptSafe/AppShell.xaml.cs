@@ -16,6 +16,9 @@ namespace RezeptSafe
             Routing.RegisterRoute(nameof(ProfilPage), typeof(ProfilPage));
             Routing.RegisterRoute(nameof(DetailsPage), typeof(DetailsPage));
             Routing.RegisterRoute(nameof(QRCodeScanner), typeof(QRCodeScanner));
+            Routing.RegisterRoute(nameof(IngredientListPage), typeof(IngredientListPage));
+            Routing.RegisterRoute(nameof(UtensilListPage), typeof(UtensilListPage));
+            Routing.RegisterRoute(nameof(UnitListPage), typeof(UnitListPage));
             #endregion
         }
     }
