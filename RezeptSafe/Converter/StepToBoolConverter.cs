@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static RezeptSafe.Model.Recipe;
+﻿using System.Globalization;
+using static Rezeptbuch.Model.Recipe;
 
-namespace RezeptSafe.Converter
+namespace Rezeptbuch.Converter
 {
     class StepToBoolConverter : IValueConverter
     {

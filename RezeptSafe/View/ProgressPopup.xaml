@@ -2,7 +2,7 @@
 <mct:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
-           x:Class="RezeptSafe.View.ProgressPopup">
+           x:Class="Rezeptbuch.View.ProgressPopup">
 
     <VerticalStackLayout Padding="20" Spacing="10">
 

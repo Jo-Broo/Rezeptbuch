@@ -1,17 +1,12 @@
 ﻿using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using RezeptSafe.Interfaces;
-using RezeptSafe.Model;
-using RezeptSafe.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Model;
+using Rezeptbuch.View;
 using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     [QueryProperty("Recipe", "Recipe")]
     public partial class RecipeDetailsViewModel : BaseViewModel

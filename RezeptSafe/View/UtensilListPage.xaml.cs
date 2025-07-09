@@ -1,6 +1,6 @@
-using RezeptSafe.ViewModel;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class UtensilListPage : ContentPage
 {

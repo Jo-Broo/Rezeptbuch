@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace RezeptSafe
+namespace Rezeptbuch
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

@@ -1,9 +1,9 @@
-﻿using RezeptSafe.Services;
-using RezeptSafe.Model;
+﻿using Rezeptbuch.Services;
+using Rezeptbuch.Model;
 using System.Collections.ObjectModel;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View
+namespace Rezeptbuch.View
 {
     public partial class ListRecipesPage : ContentPage
     {

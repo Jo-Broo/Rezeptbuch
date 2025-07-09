@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:model="clr-namespace:RezeptSafe.Model"
-             xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
-             x:Class="RezeptSafe.View.UtensilListPage"
+             xmlns:model="clr-namespace:Rezeptbuch.Model"
+             xmlns:viewmodel="clr-namespace:Rezeptbuch.ViewModel"
+             x:Class="Rezeptbuch.View.UtensilListPage"
              x:DataType="viewmodel:UtensilListViewModel"
              Title="{Binding Title}">
 

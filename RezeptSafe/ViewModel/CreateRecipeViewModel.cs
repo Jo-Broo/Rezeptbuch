@@ -1,22 +1,14 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using RezeptSafe.Interfaces;
-using RezeptSafe.Model;
-using RezeptSafe.Services;
-using RezeptSafe.View;
-using System;
-using System.Collections.Generic;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Model;
+using Rezeptbuch.View;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static RezeptSafe.Model.Recipe;
+using static Rezeptbuch.Model.Recipe;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     [QueryProperty("Recipe", "Recipe")]
     public partial class CreateRecipeViewModel : BaseViewModel
@@ -419,6 +411,7 @@ namespace RezeptSafe.ViewModel
                         if(tempUtensil is not null)
                         {
                             tempUtensil.IsSelected = true;
+                            tempUtensil.AMOUNT = utensil.AMOUNT;
                         }
                     }
 
@@ -454,7 +447,15 @@ namespace RezeptSafe.ViewModel
         async Task CreateNewIngredientAsync()
         {
             Ingredient newIngredient = new Ingredient();
-            newIngredient.NAME = await this._alertService.ShowPromptAsync("Neue Zutat erstellen", "Name der Zutat");
+            
+            var name = await this._alertService.ShowPromptAsync("Neue Zutat erstellen", "Name der Zutat");
+
+            if(name is null)
+            {
+                return;
+            }
+
+            newIngredient.NAME = name;
 
             if (!string.IsNullOrWhiteSpace(newIngredient.NAME))
             {
@@ -478,7 +479,15 @@ namespace RezeptSafe.ViewModel
         async Task CreateNewUtensilAsync()
         {
             Utensil newUtensil = new Utensil();
-            newUtensil.NAME = await this._alertService.ShowPromptAsync("Neues Utensil erstellen", "Name der Utensilie");
+            
+            var name = await this._alertService.ShowPromptAsync("Neues Utensil erstellen", "Name der Utensilie");
+
+            if(name is null)
+            {
+                return;
+            }
+
+            newUtensil.NAME = name;
 
             if (!string.IsNullOrWhiteSpace(newUtensil.NAME))
             {

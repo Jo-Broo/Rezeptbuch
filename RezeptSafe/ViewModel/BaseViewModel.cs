@@ -1,15 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
-using RezeptSafe.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using Rezeptbuch.Interfaces;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     public partial class BaseViewModel : ObservableObject
     {

@@ -1,6 +1,6 @@
-﻿using RezeptSafe.View;
+﻿using Rezeptbuch.View;
 
-namespace RezeptSafe
+namespace Rezeptbuch
 {
     public partial class AppShell : Shell
     {
@@ -19,6 +19,7 @@ namespace RezeptSafe
             Routing.RegisterRoute(nameof(IngredientListPage), typeof(IngredientListPage));
             Routing.RegisterRoute(nameof(UtensilListPage), typeof(UtensilListPage));
             Routing.RegisterRoute(nameof(UnitListPage), typeof(UnitListPage));
+            Routing.RegisterRoute(nameof(AboutPage), typeof(AboutPage));
             #endregion
         }
     }

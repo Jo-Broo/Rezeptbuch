@@ -1,12 +1,12 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
-using RezeptSafe.Interfaces;
-using RezeptSafe.Services;
-using RezeptSafe.View;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Services;
+using Rezeptbuch.View;
+using Rezeptbuch.ViewModel;
 using ZXing.Net.Maui.Controls;
 
-namespace RezeptSafe
+namespace Rezeptbuch
 {
     public static class MauiProgram
     {
@@ -46,6 +46,7 @@ namespace RezeptSafe
             builder.Services.AddTransient<IngredientListViewModel>();
             builder.Services.AddTransient<UtensilListViewModel>();
             builder.Services.AddTransient<UnitListViewModel>();
+            builder.Services.AddTransient<AboutViewModel>();
             // Pages
             builder.Services.AddSingleton<LandingPage>();
             builder.Services.AddSingleton<ListRecipesPage>();
@@ -57,6 +58,7 @@ namespace RezeptSafe
             builder.Services.AddTransient<IngredientListPage>();
             builder.Services.AddTransient<UtensilListPage>();
             builder.Services.AddTransient<UnitListPage>();
+            builder.Services.AddTransient<AboutPage>();
 
             return builder.Build();
         }

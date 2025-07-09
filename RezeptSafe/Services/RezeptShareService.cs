@@ -1,8 +1,8 @@
-﻿using RezeptSafe.Interfaces;
+﻿using Rezeptbuch.Interfaces;
 using System.IO.Compression;
 using System.Text;
 
-namespace RezeptSafe.Services
+namespace Rezeptbuch.Services
 {
     public class RezeptShareService : IRezeptShareService
     {

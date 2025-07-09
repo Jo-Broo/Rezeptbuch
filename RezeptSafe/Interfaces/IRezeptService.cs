@@ -1,7 +1,7 @@
-﻿using RezeptSafe.Model;
+﻿using Rezeptbuch.Model;
 using SQLite;
 
-namespace RezeptSafe.Interfaces
+namespace Rezeptbuch.Interfaces
 {
     public interface IRezeptService
     {

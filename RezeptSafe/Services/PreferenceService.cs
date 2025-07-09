@@ -1,12 +1,7 @@
-﻿using RezeptSafe.Enum;
-using RezeptSafe.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Rezeptbuch.Enum;
+using Rezeptbuch.Interfaces;
 
-namespace RezeptSafe.Services
+namespace Rezeptbuch.Services
 {
     public class PreferenceService : IPreferenceService
     {

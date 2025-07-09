@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
-             x:Class="RezeptSafe.View.LandingPage"
+             xmlns:viewmodel="clr-namespace:Rezeptbuch.ViewModel"
+             x:Class="Rezeptbuch.View.LandingPage"
              x:DataType="viewmodel:LandingPageViewModel"
              Title="Willkommen">
     
     <Grid Padding="10" RowSpacing="15">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -20,6 +21,7 @@
         <Button Text="Meine Rezepte anzeigen" Grid.Row="0" Command="{Binding NavigateToListRecipesCommand}"/>
         <Button Text="Neues Rezept erstellen" Grid.Row="1" Command="{Binding NavigateToCreateRecipeCommand}"/>
         <Button Text="Einstellungen" Grid.Row="2" Command="{Binding NavigateToSettingsCommand}"/>
-        <Button Text="Profil" Grid.Row="5" Command="{Binding NavigateToProfileCommand}"/>
+        <Button Text="Profil" Grid.Row="3" Command="{Binding NavigateToProfileCommand}"/>
+        <Button Text="Über" Grid.Row="6" Command="{Binding NavigateToAboutCommand}"/>
     </Grid>
 </ContentPage>

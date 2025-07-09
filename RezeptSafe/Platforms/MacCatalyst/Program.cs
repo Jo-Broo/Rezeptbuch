@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace RezeptSafe
+namespace Rezeptbuch
 {
     public class Program
     {

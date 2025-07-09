@@ -1,7 +1,7 @@
-﻿using RezeptSafe.Interfaces;
-using RezeptSafe.ViewModel;
+﻿using Rezeptbuch.Interfaces;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class LandingPage : ContentPage
 {

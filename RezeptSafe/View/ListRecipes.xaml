@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:model="clr-namespace:RezeptSafe.Model"
-             xmlns:viewmodel="clr-namespace:RezeptSafe.ViewModel"
+             xmlns:model="clr-namespace:Rezeptbuch.Model"
+             xmlns:viewmodel="clr-namespace:Rezeptbuch.ViewModel"
              x:DataType="viewmodel:RecipesViewModel"
              Title="{Binding Title}"
-             x:Class="RezeptSafe.View.ListRecipesPage">
+             x:Class="Rezeptbuch.View.ListRecipesPage">
 
     <Grid ColumnSpacing="5">
         <Grid.RowDefinitions>
@@ -41,7 +41,11 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Image Style="{StaticResource RecipeDetailImageStyle}" Source="{Binding IMAGEPATH}" IsVisible="{Binding IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}"/>
+                                <Image Style="{StaticResource RecipeDetailImageStyle}" Source="{Binding IMAGEPATH}" IsVisible="{Binding IMAGEPATH, Converter={StaticResource FilePathToBoolConverter}}">
+                                    <Image.Clip>
+                                        <RoundRectangleGeometry CornerRadius="20" Rect="5,5,100,100"/>
+                                    </Image.Clip>
+                                </Image>
                                 <VerticalStackLayout Grid.Column="1" Style="{StaticResource RecipeDetailVerticalStackStyle}">
                                     <Label Text="{Binding TITLE}" Style="{StaticResource RecipeDetailTitleLabelStyle}"/>
                                     <Label Text="{Binding UtensilienLabel}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>

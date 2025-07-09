@@ -2,12 +2,11 @@
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using RezeptSafe.Interfaces;
-using RezeptSafe.Model;
-using RezeptSafe.Services;
-using RezeptSafe.View;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Services;
+using Rezeptbuch.View;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     public partial class SettingsViewModel : BaseViewModel
     {

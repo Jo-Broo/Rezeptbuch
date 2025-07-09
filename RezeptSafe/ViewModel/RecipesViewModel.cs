@@ -1,17 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using RezeptSafe.Interfaces;
-using RezeptSafe.Model;
-using RezeptSafe.Services;
-using RezeptSafe.View;
-using System;
-using System.Collections.Generic;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Model;
+using Rezeptbuch.View;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     public partial class RecipesViewModel : BaseViewModel
     {

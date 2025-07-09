@@ -1,13 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using RezeptSafe.Interfaces;
-using RezeptSafe.View;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.View;
 
-namespace RezeptSafe.ViewModel
+namespace Rezeptbuch.ViewModel
 {
     public partial class LandingPageViewModel : BaseViewModel
     {
@@ -18,25 +13,31 @@ namespace RezeptSafe.ViewModel
         [RelayCommand]
         public async Task NavigateToListRecipesAsync()
         {
-            await Shell.Current.GoToAsync($"{nameof(ListRecipesPage)}", true);
+            await Shell.Current.GoToAsync(nameof(ListRecipesPage), true);
         }
 
         [RelayCommand]
         public async Task NavigateToCreateRecipeAsync()
         {
-            await Shell.Current.GoToAsync($"{nameof(CreateRecipePage)}", true);
+            await Shell.Current.GoToAsync(nameof(CreateRecipePage), true);
         }
 
         [RelayCommand]
         public async Task NavigateToSettingsAsync()
         {
-            await Shell.Current.GoToAsync($"{nameof(SettingsPage)}", true);
+            await Shell.Current.GoToAsync(nameof(SettingsPage), true);
         }
 
         [RelayCommand]
         public async Task NavigateToProfileAsync()
         {
-            await Shell.Current.GoToAsync($"{nameof(ProfilPage)}", true);
+            await Shell.Current.GoToAsync(nameof(ProfilPage), true);
+        }
+
+        [RelayCommand]
+        public async Task NavigateToAboutAsync()
+        {
+            await Shell.Current.GoToAsync(nameof(AboutPage),true);
         }
     }
 }

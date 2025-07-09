@@ -1,8 +1,8 @@
-using RezeptSafe.Services;
-using RezeptSafe.Model;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.Services;
+using Rezeptbuch.Model;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 
 public partial class CreateRecipePage : ContentPage

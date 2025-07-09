@@ -1,9 +1,8 @@
-﻿using RezeptSafe.Interfaces;
-using RezeptSafe.Model;
+﻿using Rezeptbuch.Interfaces;
+using Rezeptbuch.Model;
 using SQLite;
-using System.Text.Json;
 
-namespace RezeptSafe.Services
+namespace Rezeptbuch.Services
 {
     public class LocalDataBase : IRezeptService
     {

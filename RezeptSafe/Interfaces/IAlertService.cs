@@ -1,12 +1,6 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Maui.Core;
 
-namespace RezeptSafe.Interfaces
+namespace Rezeptbuch.Interfaces
 {
     public interface IAlertService
     {

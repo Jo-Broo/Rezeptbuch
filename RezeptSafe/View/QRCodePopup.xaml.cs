@@ -1,8 +1,8 @@
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class QRCodePopup : Popup
 {

@@ -1,8 +1,8 @@
-using RezeptSafe.Interfaces;
-using RezeptSafe.Services;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.Services;
+using Rezeptbuch.ViewModel;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class SettingsPage : ContentPage
 {

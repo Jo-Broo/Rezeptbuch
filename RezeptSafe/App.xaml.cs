@@ -1,4 +1,4 @@
-﻿namespace RezeptSafe
+﻿namespace Rezeptbuch
 {
     public partial class App : Application
     {

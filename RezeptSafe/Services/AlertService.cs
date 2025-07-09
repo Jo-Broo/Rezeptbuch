@@ -1,8 +1,8 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
-using RezeptSafe.Interfaces;
+using Rezeptbuch.Interfaces;
 
-namespace RezeptSafe.Services
+namespace Rezeptbuch.Services
 {
     internal class AlertService : IAlertService
     {

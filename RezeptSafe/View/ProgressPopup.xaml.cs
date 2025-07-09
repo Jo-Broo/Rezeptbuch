@@ -1,9 +1,9 @@
 using CommunityToolkit.Maui.Views;
-using RezeptSafe.Interfaces;
-using RezeptSafe.ViewModel;
+using Rezeptbuch.Interfaces;
+using Rezeptbuch.ViewModel;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class ProgressPopup : Popup, IProgressReporter
 {

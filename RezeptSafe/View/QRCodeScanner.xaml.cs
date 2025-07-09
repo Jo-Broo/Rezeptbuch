@@ -1,9 +1,9 @@
 ﻿using CommunityToolkit.Maui.Views;
-using RezeptSafe.Interfaces;
+using Rezeptbuch.Interfaces;
 using System.Threading.Tasks;
 using ZXing.Net.Maui;
 
-namespace RezeptSafe.View;
+namespace Rezeptbuch.View;
 
 public partial class QRCodeScanner : ContentPage
 {
