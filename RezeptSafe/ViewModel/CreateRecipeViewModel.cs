@@ -299,7 +299,7 @@ namespace RezeptSafe.ViewModel
                             }
                         }
 
-                        await Shell.Current.GoToAsync("..");
+                        await Shell.Current.GoToAsync("..",true);
                         await Shell.Current.GoToAsync(nameof(ListRecipesPage), true);
                     }
                 }
@@ -352,8 +352,7 @@ namespace RezeptSafe.ViewModel
                     }
                     else
                     {
-                        await Shell.Current.GoToAsync("..");
-                        await Shell.Current.GoToAsync(nameof(ListRecipesPage), true);
+                        await Shell.Current.GoToAsync("../..", true);
                     }
                 }
             }
