@@ -14,11 +14,14 @@ public partial class CreateRecipePage : ContentPage
 		InitializeComponent();
         this.BindingContext = vm;
 
-        this._qrScannerButton = new ToolbarItem
+        if(DeviceInfo.Platform == DevicePlatform.Android)
         {
-            IconImageSource = "qrcode.svg",
-            Command = vm.ScanQRCodeClickedCommand         
-        };
+            this._qrScannerButton = new ToolbarItem
+            {
+                IconImageSource = "qrcode.svg",
+                Command = vm.ScanQRCodeClickedCommand
+            };
+        }
     }
 
     protected override void OnAppearing()
@@ -29,7 +32,7 @@ public partial class CreateRecipePage : ContentPage
 
         vm?.InitializeCommand.Execute(null);
 
-        if(vm?.Recipe.ID == 0)
+        if (!this.ToolbarItems.Contains(this._qrScannerButton) && DeviceInfo.Platform == DevicePlatform.Android)
         {
             this.ToolbarItems.Add(this._qrScannerButton);
         }

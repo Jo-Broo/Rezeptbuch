@@ -2,6 +2,7 @@
 using Rezeptbuch.Model;
 using System.Collections.ObjectModel;
 using Rezeptbuch.ViewModel;
+using System.Threading.Tasks;
 
 namespace Rezeptbuch.View
 {
@@ -14,11 +15,22 @@ namespace Rezeptbuch.View
             InitializeComponent();
             this.BindingContext = viewModel;
 
-            this._addRecipeButton = new ToolbarItem
+            if(DeviceInfo.Platform == DevicePlatform.Android)
             {
-                IconImageSource = "plus.svg",
-                Command = viewModel.GoToCreateRecipeCommand
-            };
+                this._addRecipeButton = new ToolbarItem
+                {
+                    IconImageSource = "plus.svg",
+                    Command = viewModel.GoToCreateRecipeCommand
+                };
+            }
+            else
+            {
+                this._addRecipeButton = new ToolbarItem
+                {
+                    Text = "Erstellen",
+                    Command = viewModel.GoToCreateRecipeCommand
+                };
+            }
         }
 
         protected override void OnAppearing()
@@ -38,6 +50,16 @@ namespace Rezeptbuch.View
             base.OnDisappearing();
 
             this.ToolbarItems.Remove(this._addRecipeButton);
+        }
+
+        public async Task Test()
+        {
+            var vm = this.BindingContext as RecipesViewModel;
+
+            if(vm is not null)
+            {
+                await vm._alertService.ShowAlertAsync("Test", "Test");
+            }
         }
     }
 }

@@ -37,6 +37,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -55,6 +56,18 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiFont Remove="Resources\Fonts\Font-Awesome-6-Brands-Regular-400.ttf" />
+	  <MauiFont Remove="Resources\Fonts\Font-Awesome-6-Free-Regular-400_1.ttf" />
+	  <MauiFont Remove="Resources\Fonts\Font-Awesome-6-Free-Solid-900_1.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\Fonts\Font-Awesome-6-Brands-Regular-400.ttf" />
+	  <None Remove="Resources\Fonts\Font-Awesome-6-Free-Regular-400_1.ttf" />
+	  <None Remove="Resources\Fonts\Font-Awesome-6-Free-Solid-900_1.ttf" />
 	</ItemGroup>
 
 	<ItemGroup>

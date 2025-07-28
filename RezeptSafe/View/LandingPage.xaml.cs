@@ -16,18 +16,37 @@ public partial class LandingPage : ContentPage
 		this.BindingContext = vm;
         this._preferenceService = preferenceService;
 
-        this._themeButton = new ToolbarItem
+        if (DeviceInfo.Platform == DevicePlatform.Android){
+            this._themeButton = new ToolbarItem
+            {
+                IconImageSource = "sun.png",
+                Command = new Command(() => { this.ToolbarItem_Clicked(this, EventArgs.Empty); })
+            };
+        }
+        else
         {
-            IconImageSource = "sun.svg",
-            Command = new Command(() => { this.ToolbarItem_Clicked(this,EventArgs.Empty); })
-        };
+            this._themeButton = new ToolbarItem
+            {
+                Text = "Theme",
+                Command = new Command(() => { this.ToolbarItem_Clicked(this, EventArgs.Empty); })
+            };
+        }
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        this._themeButton.IconImageSource = (App.Current.UserAppTheme == AppTheme.Dark) ? "sun.svg" : "moon.svg";
+        if((App.Current?.UserAppTheme == AppTheme.Dark))
+        {
+            this._themeButton.IconImageSource = "sun.svg";
+            this._themeButton.Text = "Lightmode";
+        }
+        else
+        {
+            this._themeButton.IconImageSource = "moon.svg";
+            this._themeButton.Text = "Darkmode";
+        }
 
         this.ToolbarItems.Add(this._themeButton);
     }
@@ -43,13 +62,25 @@ public partial class LandingPage : ContentPage
     {
         try
         {
-            App.Current.UserAppTheme = App.Current.UserAppTheme == AppTheme.Dark
-            ? AppTheme.Light
-            : AppTheme.Dark;
+            if(App.Current is not null)
+            {
+                App.Current.UserAppTheme = (App.Current.UserAppTheme == AppTheme.Dark)
+                ? AppTheme.Light
+                : AppTheme.Dark;
 
-            this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.AppTheme, App.Current.UserAppTheme.ToString());
+                this._preferenceService.SetPreference(Enum.RezeptbuchPreferences.AppTheme, App.Current.UserAppTheme.ToString());
 
-            this._themeButton.IconImageSource = (App.Current.UserAppTheme == AppTheme.Dark) ? "sun.svg" : "moon.svg";
+                if ((App.Current.UserAppTheme == AppTheme.Dark))
+                {
+                    this._themeButton.IconImageSource = "sun.svg";
+                    this._themeButton.Text = "Lightmode";
+                }
+                else
+                {
+                    this._themeButton.IconImageSource = "moon.svg";
+                    this._themeButton.Text = "Darkmode";
+                }
+            }
         }
         catch (Exception ex)
         {

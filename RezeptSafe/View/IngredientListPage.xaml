@@ -45,7 +45,7 @@
                             </SwipeItems>
                         </SwipeView.RightItems>
                         <Frame CornerRadius="10" Margin="10">
-                            <Label Text="{Binding NAME}"/>
+                            <Label Text="{Binding NAME}" Style="{StaticResource RecipeDetailInfoLabelStyle}"/>
                         </Frame>
                     </SwipeView>
                 </DataTemplate>

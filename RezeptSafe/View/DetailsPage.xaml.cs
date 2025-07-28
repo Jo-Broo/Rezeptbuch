@@ -12,17 +12,34 @@ public partial class DetailsPage : ContentPage
 		InitializeComponent();
 		this.BindingContext = viewModel;
 
-        this._deleteRecipeButton = new ToolbarItem
+        if(DeviceInfo.Platform == DevicePlatform.Android)
         {
-            IconImageSource = "trash.svg",
-            Command = viewModel.DeleteRecipeCommand
-        };
+            this._deleteRecipeButton = new ToolbarItem
+            {
+                IconImageSource = "trash.svg",
+                Command = viewModel.DeleteRecipeCommand
+            };
 
-        this._editRecipeButton = new ToolbarItem
+            this._editRecipeButton = new ToolbarItem
+            {
+                IconImageSource = "pen.svg",
+                Command = viewModel.NavigateToEditRecipeCommand
+            };
+        }
+        else
         {
-            IconImageSource = "pen.svg",
-            Command = viewModel.NavigateToEditRecipeCommand
-        };
+            this._deleteRecipeButton = new ToolbarItem
+            {
+                Text = "Löschen",
+                Command = viewModel.DeleteRecipeCommand
+            };
+
+            this._editRecipeButton = new ToolbarItem
+            {
+                Text = "Bearbeiten",
+                Command = viewModel.NavigateToEditRecipeCommand
+            };
+        }
     }
 
     protected override void OnAppearing()

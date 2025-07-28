@@ -106,6 +106,7 @@ namespace Rezeptbuch.ViewModel
             }
             finally
             {
+                this.ShowAdvancedOptions = false;
                 popup.Close();
             }
         }
@@ -139,6 +140,10 @@ namespace Rezeptbuch.ViewModel
                 await this._alertService.CreateToastMessageAsync(ex.Message).Show();
 #endif
             }
+            finally
+            {
+                this.ShowAdvancedOptions = false;
+            }
         }
 
         [RelayCommand]
@@ -147,17 +152,33 @@ namespace Rezeptbuch.ViewModel
             try
             {
                 string dbPath = Path.Combine(FileSystem.AppDataDirectory, "Rezepte.db");
-                string exportPath = Path.Combine(FileSystem.Current.CacheDirectory, $"Rezepte_{DateTime.Now.ToString("ddMMyyyyHHmm")}.db");
 
-                File.Copy(dbPath, exportPath, overwrite: true);
 
-                await Share.RequestAsync(new ShareFileRequest
+                if(DeviceInfo.Platform == DevicePlatform.WinUI)
                 {
-                    Title = "SQLite DB exportieren",
-                    File = new ShareFile(exportPath)
-                });
+                    string exportPath_Win = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Downloads", $"Rezepte_{DateTime.Now.ToString("ddMMyyyyHHmm")}.db"); 
+                    File.Copy(dbPath, exportPath_Win);
 
-                await Toast.Make("Ihre Datenbank konnte erfolgreich exportiert werden", CommunityToolkit.Maui.Core.ToastDuration.Short).Show();
+                    await Toast.Make("Ihre Datenbank befindet sich in ihrem Download Ordner", CommunityToolkit.Maui.Core.ToastDuration.Short).Show();
+                }
+                else if(DeviceInfo.Platform == DevicePlatform.Android)
+                {
+                    string exportPath_Android = Path.Combine(FileSystem.Current.CacheDirectory, $"Rezepte_{DateTime.Now.ToString("ddMMyyyyHHmm")}.db");
+                    File.Copy(dbPath, exportPath_Android, overwrite: true);
+                    
+                    await Share.RequestAsync(new ShareFileRequest
+                    {
+                        Title = "SQLite DB exportieren",
+                        File = new ShareFile(exportPath_Android)
+                    });
+                }
+                else
+                {
+                    throw new Exception("Das exportieren der Rezeptdatenbank ist für deine Platform nicht unterstützt");
+
+                }
+
+                //await Toast.Make("Ihre Datenbank konnte erfolgreich exportiert werden", CommunityToolkit.Maui.Core.ToastDuration.Short).Show();
             }
             catch (Exception ex)
             {
@@ -166,6 +187,10 @@ namespace Rezeptbuch.ViewModel
 #else
                 await this._alertService.CreateToastMessageAsync(ex.Message).Show();
 #endif
+            }
+            finally
+            {
+                this.ShowAdvancedOptions = false;
             }
         }
 

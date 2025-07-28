@@ -69,7 +69,7 @@ namespace Rezeptbuch.ViewModel
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                await Shell.Current.DisplayAlert("Error!", ex.Message, "OK");
+                //await Shell.Current.DisplayAlert("Error!", ex.Message, "OK");
             }
             finally 
             {

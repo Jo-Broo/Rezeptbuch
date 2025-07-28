@@ -22,7 +22,7 @@
                         SelectionMode="None">
             <CollectionView.EmptyView>
                 <Grid RowDefinitions="*,auto,*">
-                    <Button Grid.Row="1" Command="{Binding GoToCreateRecipeCommand}" Text="Erstellen sie ihr erstes Rezept"/>
+                    <Button Grid.Row="1" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodel:RecipesViewModel}}, Path=GoToCreateRecipeCommand}" Text="Erstellen sie ihr erstes Rezept"/>
                 </Grid>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
@@ -60,10 +60,10 @@
         </CollectionView>
 
         <ActivityIndicator IsVisible="{Binding IsBusy}"
-                           IsRunning="{Binding IsBusy}"
-                           HorizontalOptions="Fill"
-                           VerticalOptions="Center"
-                           Grid.RowSpan="2"
-                           Grid.ColumnSpan="2"/>
+                   IsRunning="{Binding IsBusy}"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Center"
+                   Grid.RowSpan="2"
+                   Grid.ColumnSpan="2"/>
     </Grid>
 </ContentPage>
